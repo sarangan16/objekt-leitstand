@@ -1,0 +1,1329 @@
+<title>Objekt-Leitstand</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,500;112,700;125,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: Leitstand – feste Seitenleiste, Arbeitsfläche rechts; Anlagen als „Typenschilder“ */
+:root{
+  --bg:#121416; --surface:#191c1f; --surface2:#21252a; --line:#30353b; --fg:#e8e5df; --muted:#9ba1a7;
+  --accent:#c98f5f; --accent-ink:#1b130c; --accent-soft:rgba(201,143,95,.14);
+  --red:#ef5a5f; --red-soft:rgba(239,90,95,.14); --amber:#e3a83d; --amber-soft:rgba(227,168,61,.14); --green:#55b98a; --green-soft:rgba(85,185,138,.14);
+  --plate:#24282d; --rivet:#4a5058;
+  --f-display:"Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r:6px;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){
+  --bg:#f1f0ec; --surface:#ffffff; --surface2:#e9e7e1; --line:#d6d3cb; --fg:#1c1e20; --muted:#5d6166;
+  --accent:#9c5d2b; --accent-ink:#ffffff; --accent-soft:rgba(156,93,43,.10);
+  --red:#c42b30; --red-soft:rgba(196,43,48,.09); --amber:#a86f00; --amber-soft:rgba(168,111,0,.10); --green:#23825a; --green-soft:rgba(35,130,90,.10);
+  --plate:#f6f5f1; --rivet:#b9b5ac; color-scheme:light } }
+:root[data-theme="light"]{
+  --bg:#f1f0ec; --surface:#ffffff; --surface2:#e9e7e1; --line:#d6d3cb; --fg:#1c1e20; --muted:#5d6166;
+  --accent:#9c5d2b; --accent-ink:#ffffff; --accent-soft:rgba(156,93,43,.10);
+  --red:#c42b30; --red-soft:rgba(196,43,48,.09); --amber:#a86f00; --amber-soft:rgba(168,111,0,.10); --green:#23825a; --green-soft:rgba(35,130,90,.10);
+  --plate:#f6f5f1; --rivet:#b9b5ac; color-scheme:light }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.shell{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:100%}
+.side{background:var(--surface);border-right:1px solid var(--line);padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:18px;overflow:auto}
+.brand{font-family:var(--f-display);font-stretch:125%;font-weight:800;letter-spacing:.02em;font-size:17px;line-height:1.1;text-transform:uppercase}
+.brand small{display:block;font-family:var(--f-mono);font-stretch:100%;font-weight:400;font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:none;margin-top:4px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r);text-decoration:none;color:var(--muted);font-weight:700;font-size:14px}
+.nav a:hover{background:var(--surface2);color:var(--fg)}
+.nav a.on{background:var(--accent-soft);color:var(--fg)}
+.nav a.call{background:var(--accent);color:var(--accent-ink);margin-bottom:8px}
+.nav a.call:hover{filter:brightness(1.08)}
+.nav .cnt{margin-left:auto;font-family:var(--f-mono);font-size:11px;font-weight:600;padding:1px 6px;border-radius:9px;background:var(--red-soft);color:var(--red)}
+.nav svg{width:16px;height:16px;flex:none}
+.side-foot{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.lang{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;width:max-content}
+.lang button{border:0;background:transparent;padding:5px 12px;font-family:var(--f-mono);font-size:12px;font-weight:600;cursor:pointer;color:var(--muted)}
+.lang button.on{background:var(--fg);color:var(--bg)}
+.mode{font-size:12px;color:var(--muted)}
+.main{min-width:0;padding-block:28px 64px;padding-left:28px;padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1120px}
+h1,h2,h3{font-family:var(--f-display);font-stretch:112%;text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:28px;font-weight:700}
+h2{font-size:18px;font-weight:700}
+h3{font-size:15px;font-weight:700}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:22px}
+.head .eyebrow{margin-bottom:6px}
+.muted{color:var(--muted)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:var(--r);cursor:pointer;font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--red)}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn[disabled]{opacity:.5;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))}
+.g3{grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr))}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0}
+.panel>h2{margin-bottom:12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:18px}
+.stat{background:var(--surface);padding:14px 16px}
+.stat b{display:block;font-family:var(--f-display);font-stretch:112%;font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+.stat .sub{font-size:12px;color:var(--muted)}
+.list{display:flex;flex-direction:column}
+.item{display:grid;grid-template-columns:4px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line);cursor:pointer;text-decoration:none}
+.item:first-child{border-top:0}
+.item:hover .ttl{color:var(--accent)}
+.item .bar{align-self:stretch;border-radius:2px;background:var(--line)}
+.item .ttl{font-weight:700}
+.item .meta{font-size:13px;color:var(--muted)}
+.bar.red{background:var(--red)} .bar.amber{background:var(--amber)} .bar.green{background:var(--green)}
+.sev{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:12px;white-space:nowrap}
+.sev::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.sev.red{color:var(--red);background:var(--red-soft)} .sev.amber{color:var(--amber);background:var(--amber-soft)} .sev.green{color:var(--green);background:var(--green-soft)}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:6px 12px;cursor:pointer;font-size:14px;font-weight:700}
+.chip:hover{border-color:var(--muted)}
+.chip.on{border-color:var(--accent);background:var(--accent-soft)}
+.chip .code{font-family:var(--f-mono);font-size:11px;color:var(--muted);font-weight:600}
+.tag{font-family:var(--f-mono);font-size:11px;padding:1px 6px;border:1px solid var(--line);border-radius:4px;color:var(--muted)}
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:28px;text-align:center;color:var(--muted)}
+.empty b{display:block;color:var(--fg);font-size:16px;margin-bottom:4px}
+.banner{border:1px solid var(--amber);background:var(--amber-soft);border-radius:var(--r);padding:10px 14px;font-size:14px;margin-bottom:18px}
+/* Typenschild */
+.plate{position:relative;background:var(--plate);border:1px solid var(--line);border-radius:4px;padding:16px 18px 14px;text-decoration:none;display:block;min-width:0}
+.plate::before,.plate::after{content:"";position:absolute;width:7px;height:7px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--line),var(--rivet));top:8px}
+.plate::before{left:8px}.plate::after{right:8px}
+a.plate:hover{border-color:var(--accent)}
+.plate .p-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:8px}
+.plate .p-code{font-family:var(--f-display);font-stretch:125%;font-weight:800;font-size:13px;letter-spacing:.08em;color:var(--accent)}
+.plate .p-name{font-weight:700;font-size:15px;line-height:1.3}
+.plate dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;margin:8px 0 0;font-size:13px}
+.plate dt{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.plate dd{margin:0;font-family:var(--f-mono);font-size:12.5px;overflow-wrap:anywhere}
+.thumb{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;background:var(--surface2);display:block;max-width:100%}
+.prop-card{display:flex;flex-direction:column;gap:10px;text-decoration:none}
+.prop-card:hover h2{color:var(--accent)}
+.ph{width:100%;aspect-ratio:16/9;border-radius:4px;background:repeating-linear-gradient(135deg,var(--surface2) 0 10px,var(--surface) 10px 20px);display:grid;place-items:center;color:var(--muted);font-family:var(--f-mono);font-size:12px;max-width:100%}
+/* Störung aufnehmen */
+.steps{display:flex;flex-direction:column;gap:14px}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.step .n{font-family:var(--f-mono);font-size:11px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.light{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:var(--r);border:1px solid}
+.light.red{border-color:var(--red);background:var(--red-soft)} .light.amber{border-color:var(--amber);background:var(--amber-soft)} .light.green{border-color:var(--green);background:var(--green-soft)}
+.lamp{display:flex;flex-direction:column;gap:4px;padding:6px;background:var(--bg);border-radius:14px;flex:none}
+.lamp i{width:14px;height:14px;border-radius:50%;background:var(--surface2);display:block}
+.light.red .lamp i.r{background:var(--red);box-shadow:0 0 10px var(--red)}
+.light.amber .lamp i.a{background:var(--amber);box-shadow:0 0 10px var(--amber)}
+.light.green .lamp i.g{background:var(--green);box-shadow:0 0 10px var(--green)}
+.light h2{font-size:20px}
+.qs{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.qs label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.qs input{margin-top:4px;accent-color:var(--accent)}
+.cause{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;padding:10px 0;border-top:1px solid var(--line)}
+.cause:first-child{border-top:0}
+.meter{display:flex;gap:2px;margin-top:5px}
+.meter i{width:10px;height:6px;border-radius:1px;background:var(--surface2)}
+.meter i.on{background:var(--accent)}
+.cost{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.callwho{display:flex;flex-direction:column;gap:8px}
+.contact{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
+.phone{font-family:var(--f-mono);font-weight:600;font-size:15px;user-select:all}
+textarea,input[type=text],input[type=number],input[type=date],input[type=tel],input[type=email],input[type=search],select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px}
+textarea{min-height:84px;resize:vertical}
+.field{display:flex;flex-direction:column;gap:4px}
+.field>span{font-size:13px;font-weight:700;color:var(--muted)}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px}
+.form .wide{grid-column:1/-1}
+.ai{border:1px solid var(--accent);border-radius:var(--r);padding:14px 16px;background:var(--accent-soft)}
+.ai .eyebrow{color:var(--accent)}
+.prose{max-width:68ch}
+.prose p{margin:0 0 8px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px;overflow-x:auto}
+.tabs button{border:0;background:none;padding:8px 12px;cursor:pointer;font-weight:700;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button.on{color:var(--fg);border-color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-top:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;border-top:0}
+.tscroll{overflow-x:auto}
+.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.due-over{color:var(--red);font-weight:700}.due-soon{color:var(--amber);font-weight:700}
+.check{border-radius:var(--r);padding:12px 14px;font-size:14px}
+.check.warn{background:var(--amber-soft);border:1px solid var(--amber)}
+.check.ok{background:var(--green-soft);border:1px solid var(--green)}
+.check.bad{background:var(--red-soft);border:1px solid var(--red)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));z-index:50}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:8px;width:min(680px,100%);max-height:100%;overflow:auto;padding:20px}
+.modal .mhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:var(--r);font-weight:700;z-index:60;max-width:calc(100% - 32px)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spin{animation:none}}
+.qr{background:#fff;padding:10px;border-radius:4px;width:max-content}
+.qr img,.qr canvas{display:block;width:150px;height:150px}
+.gl-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,2fr);gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.gl-row b{font-weight:700}
+.cat-card{cursor:pointer}
+.cat-card:hover{border-color:var(--accent)}
+details summary{cursor:pointer;font-weight:700}
+@media (max-width:760px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .side{position:sticky;top:env(safe-area-inset-top,0px);height:auto;z-index:20;flex-direction:row;align-items:center;gap:12px;padding-block:10px;padding-right:max(16px,env(safe-area-inset-right,0px));border-right:0;border-bottom:1px solid var(--line);overflow:visible}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+  .brand small{display:none}
+  .brand{font-size:13px;flex:none}
+  .nav{flex-direction:row;overflow-x:auto;flex:1;min-width:0;gap:4px;scrollbar-width:none}
+  .nav a{padding:6px 10px;white-space:nowrap;font-size:13px}
+  .nav a.call{margin-bottom:0}
+  .nav svg{display:none}
+  .side-foot{margin-top:0;flex:none}
+  .side-foot .mode{display:none}
+  .main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-top:20px}
+  h1{font-size:23px}
+  .gl-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .gl-row .gl-x{grid-column:1/-1}
+}
+</style>
+
+<div class="shell">
+  <aside class="side">
+    <div class="brand">Objekt-Leitstand<small>Raavn · Facility</small></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div class="lang" role="group" aria-label="Sprache / Language">
+        <button type="button" id="lang-de">DE</button><button type="button" id="lang-en">EN</button>
+      </div>
+      <div class="mode" id="mode"></div>
+    </div>
+  </aside>
+  <main class="main"><div class="wrap" id="view"></div></main>
+</div>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+// Fachwissen: Anlagen, Symptome, Ursachen, Prüfpflichten, Wörterbuch (DE/EN)
+const L = (de, en) => ({ de, en });
+
+const TRADES = {
+  heating: L("Heizung & Sanitär", "Heating & plumbing"),
+  electrical: L("Elektro", "Electrical"),
+  doors: L("Tore & Türen", "Doors & gates"),
+  fire: L("Brandschutz", "Fire safety"),
+  lift: L("Aufzug", "Lift"),
+  hvac: L("Lüftung & Klima", "Ventilation & AC"),
+  roof: L("Dach", "Roofing"),
+  caretaker: L("Hausmeister", "Caretaker"),
+  disposal: L("Entsorgung", "Waste disposal"),
+  other: L("Sonstiges", "Other")
+};
+
+const SEV = {
+  red: { label: L("Notfall", "Emergency"), hint: L("Sofort handeln, Notdienst anrufen.", "Act now, call the emergency service.") },
+  amber: { label: L("Dringend", "Urgent"), hint: L("Heute oder morgen beheben lassen.", "Get it fixed today or tomorrow.") },
+  green: { label: L("Kann warten", "Can wait"), hint: L("Normal einplanen, nächster Termin reicht.", "Schedule normally, next available slot is fine.") }
+};
+
+// p = Wahrscheinlichkeit 1–3, k = grobe Kosten 1–3 (€, €€, €€€)
+const CATALOG = {
+  gas_boiler: {
+    code: "HZG", trade: "heating",
+    name: L("Gas-Brennwertkessel", "Gas condensing boiler"),
+    what: L("Erzeugt mit Gas die Wärme für Heizkörper und oft auch Warmwasser. Ein Brenner verbrennt Gas, ein Wärmetauscher erhitzt das Heizungswasser, eine Pumpe schickt es durch das Gebäude.",
+            "Burns gas to heat the water that runs through the radiators, often also the hot tap water. A burner makes the flame, a heat exchanger warms the water, a pump moves it round the building."),
+    insp: [{ l: L("Wartung durch Heizungsfachbetrieb", "Service by heating contractor"), m: 12 }, { l: L("Schornsteinfeger: Abgasmessung / Feuerstättenschau laut Bescheid", "Chimney sweep: flue gas check as per notice"), m: 12 }],
+    sym: [
+      { id: "no_heat", sev: "amber", l: L("Keine Heizung / kein Warmwasser", "No heating / no hot water"),
+        act: L("Druck und Fehlercode erfragen. Bei Kälte im Winter am selben Tag Heizungsfirma rufen.", "Ask for the pressure and the error code. In cold weather, call the heating firm the same day."),
+        q: [L("Zeigt das Display einen Fehlercode (z. B. F28, F.28, E01)? Bitte genau ablesen.", "Does the display show an error code (e.g. F28, F.28, E01)? Please read it exactly."),
+            L("Was zeigt das Manometer (Druckanzeige)? Normal sind 1,5 bis 2 bar.", "What does the pressure gauge show? Normal is 1.5 to 2 bar."),
+            L("Ist das Display an, also ist Strom da?", "Is the display on, so there is power?"),
+            L("Ist der gelbe Gashahn unter dem Kessel offen (Griff längs zur Leitung)?", "Is the yellow gas tap under the boiler open (handle in line with the pipe)?")],
+        c: [{ t: L("Wasserdruck zu niedrig", "Water pressure too low"), w: L("Unter ca. 1 bar schaltet der Kessel sich zum Schutz ab. Hausmeister oder Heizungsfirma füllt Wasser nach. Fällt der Druck immer wieder, gibt es irgendwo ein Leck.", "Below about 1 bar the boiler switches itself off for protection. The caretaker or heating firm tops up the water. If the pressure keeps dropping, there is a leak somewhere."), p: 3, k: 1 },
+            { t: L("Störabschaltung des Brenners (Verriegelung)", "Burner safety lockout"), w: L("Der Brenner hat nicht gezündet und sich gesperrt. Einmal die Entstörtaste (Reset) drücken ist erlaubt. Kommt der Fehler wieder, muss ein Techniker kommen.", "The burner failed to light and locked itself. Pressing the reset button once is fine. If the fault comes back, a technician must come."), p: 3, k: 2 },
+            { t: L("Zündelektrode oder Flammenfühler defekt", "Ignition electrode or flame sensor faulty"), w: L("Kleine Verschleißteile, die die Flamme zünden bzw. erkennen. Typische Reparatur beim Kundendienst.", "Small wear parts that light the flame or detect it. A typical service repair."), p: 2, k: 2 },
+            { t: L("Keine Gaszufuhr", "No gas supply"), w: L("Gashahn zu, Gaszähler gesperrt oder Störung beim Versorger.", "Gas tap closed, gas meter blocked or an outage at the supplier."), p: 1, k: 1 },
+            { t: L("Stromausfall / Sicherung", "Power cut / fuse"), w: L("Display dunkel: Sicherung oder Notschalter (oft rot, an der Tür zum Heizraum) prüfen lassen.", "Display dark: have the fuse or the emergency switch (often red, by the boiler room door) checked."), p: 1, k: 1 }] },
+      { id: "cold_radiators", sev: "green", l: L("Einzelne Heizkörper bleiben kalt", "Some radiators stay cold"),
+        q: [L("Sind alle Heizkörper kalt oder nur einzelne?", "Are all radiators cold or only some?"), L("Gluckert oder rauscht es im Heizkörper?", "Is there gurgling in the radiator?"), L("Ist das Thermostat auf Stufe 3 oder höher?", "Is the thermostat set to 3 or higher?")],
+        act: L("Kein Notfall. Hausmeister zum Entlüften schicken.", "Not an emergency. Send the caretaker to bleed the radiators."),
+        c: [{ t: L("Luft im Heizkörper", "Air in the radiator"), w: L("Luft blockiert das warme Wasser, oben bleibt er kalt. Entlüften löst das in Minuten.", "Air blocks the hot water, so the top stays cold. Bleeding fixes it in minutes."), p: 3, k: 1 },
+            { t: L("Thermostatventil klemmt", "Thermostat valve stuck"), w: L("Der kleine Stift im Ventil hängt nach dem Sommer fest. Gängig machen oder Ventilkopf tauschen.", "The small pin in the valve sticks after summer. Free it or swap the valve head."), p: 2, k: 1 },
+            { t: L("Hydraulischer Abgleich fehlt", "System not balanced"), w: L("Weit entfernte Heizkörper bekommen zu wenig Wasser. Das stellt die Heizungsfirma einmalig ein.", "Radiators far from the boiler get too little water. The heating firm adjusts this once."), p: 1, k: 2 }] },
+      { id: "gas_smell", sev: "red", l: L("Gasgeruch", "Smell of gas"),
+        act: L("Sofort: Gebäude räumen lassen. Keine Lichtschalter, Klingeln oder Handys im Raum benutzen. Fenster öffnen, Gashaupthahn nur schließen wenn gefahrlos. Von draußen die Störungsnummer des Gasversorgers anrufen, bei Gefahr 112.", "Immediately: get everyone out. No light switches, doorbells or phones in the room. Open windows, close the main gas tap only if safe. From outside call the gas supplier's emergency number, 112 if in danger."),
+        q: [L("Wo genau riecht es, und wie stark?", "Where exactly is the smell, and how strong?"), L("Sind alle Personen draußen?", "Is everyone outside?")],
+        c: [{ t: L("Undichte Gasleitung oder Verbindung", "Leaking gas pipe or fitting"), w: L("Lebensgefahr durch Explosion. Nur der Gasversorger bzw. Fachbetrieb darf das prüfen.", "Risk of explosion. Only the gas supplier or a licensed firm may check this."), p: 3, k: 2 }] },
+      { id: "water_at_boiler", sev: "amber", l: L("Wasser tropft am Kessel", "Water dripping at the boiler"),
+        q: [L("Tropft es aus einem Schlauch in einen Trichter oder aus einer Verbindung?", "Is it dripping from a hose into a funnel or from a joint?"), L("Wie hoch ist der Druck? Über 2,5 bar?", "What is the pressure? Above 2.5 bar?")],
+        act: L("Eimer unterstellen, Heizungsfirma heute anrufen.", "Put a bucket under it, call the heating firm today."),
+        c: [{ t: L("Sicherheitsventil löst aus", "Safety valve releasing"), w: L("Bei Überdruck lässt das Ventil Wasser ab. Oft ist das Ausdehnungsgefäß leer und muss nachgefüllt oder getauscht werden.", "At too high pressure the valve releases water. Often the expansion vessel has lost its air and needs refilling or replacing."), p: 3, k: 2 },
+            { t: L("Kondensatablauf verstopft", "Condensate drain blocked"), w: L("Brennwertkessel erzeugen Wasser (Kondensat). Ist der Siphon verstopft, läuft es über.", "Condensing boilers make water (condensate). If the drain trap is blocked, it overflows."), p: 2, k: 1 },
+            { t: L("Undichte Verschraubung", "Leaking joint"), w: L("Eine Dichtung ist alt. Kleine Reparatur.", "An old seal. A small repair."), p: 2, k: 1 }] },
+      { id: "noise", sev: "green", l: L("Laute Geräusche (Rauschen, Klopfen, Pfeifen)", "Loud noises (rushing, knocking, whistling)"),
+        q: [L("Wann ist das Geräusch: beim Starten oder dauerhaft?", "When is the noise: on start-up or all the time?"), L("Gab es einen Knall beim Zünden?", "Was there a bang on ignition?")],
+        act: L("Bei einem Knall beim Zünden: dringend Fachbetrieb rufen. Sonst normal einplanen.", "If there is a bang on ignition: call the firm urgently. Otherwise schedule normally."),
+        c: [{ t: L("Luft im System", "Air in the system"), w: L("Rauschen und Gluckern. Entlüften und Druck prüfen.", "Rushing and gurgling. Bleed and check the pressure."), p: 3, k: 1 },
+            { t: L("Umwälzpumpe verschlissen", "Circulation pump worn"), w: L("Die Pumpe brummt oder rattert. Tausch ist eine Standardreparatur.", "The pump hums or rattles. Replacing it is a standard repair."), p: 2, k: 2 },
+            { t: L("Verkalkung im Wärmetauscher", "Limescale in the heat exchanger"), w: L("Klopfen oder Pfeifen wie ein Wasserkocher. Spülung durch Fachbetrieb.", "Knocking or whistling like a kettle. The firm flushes it out."), p: 1, k: 2 }] }
+    ]
+  },
+  heat_pump: {
+    code: "WP", trade: "heating",
+    name: L("Wärmepumpe", "Heat pump"),
+    what: L("Holt Wärme aus der Außenluft oder dem Erdreich und hebt sie mit Strom auf Heiztemperatur. Außeneinheit mit Ventilator, Inneneinheit mit Regelung.", "Takes heat from the outside air or the ground and raises it to heating temperature using electricity. Outdoor unit with a fan, indoor unit with the controls."),
+    insp: [{ l: L("Wartung + Dichtheitsprüfung Kältemittel (F-Gase, je nach Füllmenge)", "Service + refrigerant leak check (F-gas, depends on charge)"), m: 12 }],
+    sym: [
+      { id: "no_heat", sev: "amber", l: L("Keine oder zu wenig Wärme", "No heat or too little heat"),
+        q: [L("Fehlercode am Regler?", "Error code on the controller?"), L("Ist die Außeneinheit vereist oder dreht der Ventilator?", "Is the outdoor unit iced up or is the fan turning?"), L("Seit wann? Nur zu bestimmten Uhrzeiten?", "Since when? Only at certain times of day?")],
+        act: L("Fehlercode notieren, Fachbetrieb heute informieren.", "Note the error code, inform the firm today."),
+        c: [{ t: L("Sperrzeit des Stromversorgers", "Utility power block"), w: L("Viele Wärmepumpen-Tarife erlauben dem Netzbetreiber kurze Abschaltungen. Kommt von selbst zurück.", "Many heat pump tariffs let the grid operator switch it off for short periods. It comes back by itself."), p: 2, k: 1 },
+            { t: L("Außeneinheit vereist / Abtauen gestört", "Outdoor unit iced / defrost fault"), w: L("Normal taut sie selbst ab. Bleibt das Eis, stimmt etwas mit der Abtauung oder dem Ventilator nicht.", "Normally it defrosts by itself. If the ice stays, the defrost or the fan has a problem."), p: 2, k: 2 },
+            { t: L("Kältemittelmangel", "Low refrigerant"), w: L("Kleines Leck im Kältekreis. Nur zertifizierte Kältetechniker dürfen das reparieren.", "A small leak in the refrigerant circuit. Only certified technicians may repair it."), p: 1, k: 3 },
+            { t: L("Druck im Heizkreis zu niedrig", "Low pressure in the heating circuit"), w: L("Wie beim Kessel: Wasser nachfüllen lassen.", "Same as with a boiler: have water topped up."), p: 2, k: 1 }] },
+      { id: "high_power", sev: "green", l: L("Sehr hoher Stromverbrauch", "Very high power use"),
+        q: [L("Läuft der elektrische Heizstab dauerhaft mit?", "Is the electric backup heater running all the time?")],
+        act: L("Kein Notfall. Einstellungen beim nächsten Wartungstermin prüfen lassen.", "Not an emergency. Have the settings checked at the next service."),
+        c: [{ t: L("Heizstab springt zu oft ein", "Backup heater runs too often"), w: L("Der Heizstab ist teurer Notbetrieb. Meist falsch eingestellt.", "The backup heater is expensive emergency mode. Usually set up wrong."), p: 3, k: 1 }] }
+    ]
+  },
+  district_heat: {
+    code: "FW", trade: "heating",
+    name: L("Fernwärme-Übergabestation", "District heating substation"),
+    what: L("Die Wärme kommt fertig vom Versorger über Leitungen ins Haus. Die Station übergibt sie über einen Wärmetauscher an die Heizung im Gebäude.", "Heat arrives ready-made from the supplier through pipes. The substation passes it via a heat exchanger to the building's heating."),
+    insp: [{ l: L("Wartung Regelung und Pumpen", "Service of controls and pumps"), m: 12 }],
+    sym: [
+      { id: "no_heat", sev: "amber", l: L("Keine Heizung", "No heating"),
+        q: [L("Betrifft es nur dieses Gebäude oder die ganze Straße?", "Does it affect only this building or the whole street?"), L("Fehler am Regler?", "Any fault on the controller?")],
+        act: L("Zuerst Störungsnummer des Fernwärmeversorgers anrufen, dann Heizungsfirma.", "First call the district heating supplier's fault line, then the heating firm."),
+        c: [{ t: L("Störung beim Versorger", "Supplier outage"), w: L("Liegt außerhalb des Gebäudes, der Versorger repariert.", "Outside the building, the supplier fixes it."), p: 2, k: 1 },
+            { t: L("Regelventil oder Pumpe im Haus defekt", "Control valve or pump in the building faulty"), w: L("Auftrag an die Heizungsfirma.", "Job for the heating firm."), p: 2, k: 2 }] }
+    ]
+  },
+  hot_water: {
+    code: "TWW", trade: "heating",
+    name: L("Warmwasser (Speicher / Durchlauferhitzer)", "Hot water (tank / instant heater)"),
+    what: L("Erwärmt das Trinkwasser für Küchen, Duschen, Waschbecken. Entweder großer Speicher oder elektrischer Durchlauferhitzer direkt am Waschbecken.", "Heats drinking water for kitchens, showers, basins. Either a large tank or an electric instant heater at the basin."),
+    insp: [{ l: L("Legionellen-Untersuchung (bei Großanlagen, i. d. R. alle 3 Jahre)", "Legionella test (large systems, usually every 3 years)"), m: 36 }],
+    sym: [
+      { id: "no_hot", sev: "amber", l: L("Kein warmes Wasser", "No hot water"),
+        q: [L("Überall oder nur an einer Stelle?", "Everywhere or at one tap only?"), L("Funktioniert die Heizung?", "Is the heating working?")],
+        act: L("Bei nur einer Stelle: Elektriker / Sanitär. Bei überall: wie Heizungsausfall behandeln.", "One tap only: electrician / plumber. Everywhere: treat it like a heating failure."),
+        c: [{ t: L("Durchlauferhitzer defekt oder Sicherung raus", "Instant heater faulty or fuse tripped"), w: L("Betrifft nur ein Waschbecken. Sicherung prüfen, sonst Gerät tauschen.", "Only one basin affected. Check the fuse, otherwise replace the unit."), p: 2, k: 2 },
+            { t: L("Kessel / Wärmepumpe aus", "Boiler / heat pump off"), w: L("Der Speicher wird von der Heizung erwärmt. Erst die Heizung prüfen.", "The tank is heated by the heating system. Check the heating first."), p: 2, k: 2 },
+            { t: L("Heizstab im Speicher defekt", "Tank heating element faulty"), w: L("Elektrisches Bauteil im Speicher, Tausch durch Fachbetrieb.", "Electric part inside the tank, replaced by a firm."), p: 1, k: 2 }] },
+      { id: "brown_smell", sev: "amber", l: L("Wasser braun oder riecht muffig", "Water brown or smells musty"),
+        q: [L("Nur warmes oder auch kaltes Wasser?", "Only hot or also cold water?"), L("Wurde das Wasser länger nicht benutzt?", "Has the water been unused for a while?")],
+        act: L("Mieter informieren, nicht trinken. Sanitärfirma und ggf. Labor für Wasserprobe beauftragen.", "Inform the tenant, do not drink it. Order the plumber and possibly a lab water test."),
+        c: [{ t: L("Stagnation / Legionellen-Risiko", "Stagnant water / legionella risk"), w: L("Stehendes warmes Wasser kann Bakterien bilden. Spülen und Probe nehmen lassen.", "Standing warm water can grow bacteria. Flush and take a sample."), p: 2, k: 2 },
+            { t: L("Rost in alten Leitungen", "Rust in old pipes"), w: L("Braunes Wasser nach Arbeiten am Netz. Spülen hilft meist.", "Brown water after work on the network. Flushing usually helps."), p: 2, k: 1 }] }
+    ]
+  },
+  water_pipes: {
+    code: "SAN", trade: "heating",
+    name: L("Wasserleitungen & Abwasser", "Water pipes & drains"),
+    what: L("Alle Leitungen für Frischwasser und Abwasser. Der Hauptabsperrhahn sitzt meist beim Wasserzähler im Keller.", "All pipes for fresh water and waste water. The main stop valve is usually next to the water meter in the basement."),
+    insp: [],
+    sym: [
+      { id: "leak", sev: "red", l: L("Wasserschaden / Rohrbruch", "Water leak / burst pipe"),
+        act: L("Hauptabsperrhahn schließen lassen. Wenn Wasser in der Nähe von Strom ist: Sicherungen raus, Raum nicht betreten. Sanitär-Notdienst rufen, Fotos machen (Versicherung).", "Have the main stop valve closed. If water is near electrics: switch off fuses, do not enter. Call the emergency plumber, take photos (insurance)."),
+        q: [L("Wo kommt das Wasser her: Decke, Wand, Boden, Rohr?", "Where does the water come from: ceiling, wall, floor, pipe?"), L("Ist Strom in der Nähe (Steckdosen, Verteiler)?", "Are there electrics nearby (sockets, distribution board)?"), L("Wer weiß, wo der Hauptabsperrhahn ist?", "Who knows where the main stop valve is?")],
+        c: [{ t: L("Rohrbruch / undichte Leitung", "Burst or leaking pipe"), w: L("Wasser muss sofort gestoppt werden. Danach Trocknung und Versicherung melden.", "The water must be stopped at once. Then drying and an insurance claim."), p: 3, k: 3 },
+            { t: L("Undichter Anschluss an Gerät", "Leaking appliance connection"), w: L("Spülmaschine, Kaffeemaschine, WC. Eckventil am Gerät schließen.", "Dishwasher, coffee machine, toilet. Close the small valve at the appliance."), p: 2, k: 1 }] },
+      { id: "blocked", sev: "amber", l: L("Abfluss verstopft / WC läuft über", "Drain blocked / toilet overflowing"),
+        q: [L("Ein Abfluss oder mehrere gleichzeitig?", "One drain or several at once?"), L("Kommt Wasser im Keller hoch?", "Is water coming up in the basement?")],
+        act: L("Mehrere Abflüsse oder Keller: Rohrreinigung heute. Ein WC: normal beauftragen.", "Several drains or basement: drain cleaning today. One toilet: normal job."),
+        c: [{ t: L("Verstopfung in einer Leitung", "Blockage in one pipe"), w: L("Meist Papier oder Fett. Rohrreinigungsfirma.", "Usually paper or grease. Drain cleaning firm."), p: 3, k: 1 },
+            { t: L("Hauptleitung / Grundleitung verstopft", "Main drain blocked"), w: L("Wenn mehrere Abflüsse betroffen sind. Kamera-Inspektion sinnvoll.", "When several drains are affected. A camera check makes sense."), p: 2, k: 2 }] }
+    ]
+  },
+  ventilation: {
+    code: "RLT", trade: "hvac",
+    name: L("Lüftungsanlage (RLT)", "Ventilation system (AHU)"),
+    what: L("Bläst frische Luft in die Räume und zieht verbrauchte Luft ab, mit Filtern und oft Wärmerückgewinnung.", "Blows fresh air into rooms and extracts stale air, with filters and often heat recovery."),
+    insp: [{ l: L("Wartung + Filterwechsel", "Service + filter change"), m: 6 }, { l: L("Hygieneinspektion nach VDI 6022 (alle 2–3 Jahre)", "Hygiene inspection VDI 6022 (every 2–3 years)"), m: 36 }],
+    sym: [
+      { id: "off", sev: "amber", l: L("Anlage läuft nicht", "System not running"),
+        q: [L("Störmeldung am Schaltschrank?", "Fault light on the control panel?"), L("Gab es vorher einen Feueralarm?", "Was there a fire alarm before?")],
+        act: L("Lüftungsfirma heute informieren. In Räumen ohne Fenster Mieter auf Lüften / Pausen hinweisen.", "Inform the ventilation firm today. In rooms without windows, advise the tenant."),
+        c: [{ t: L("Filter verstopft (Differenzdruck-Alarm)", "Filter clogged (pressure alarm)"), w: L("Dreckige Filter lösen eine Abschaltung aus. Filterwechsel.", "Dirty filters trigger a shutdown. Change filters."), p: 3, k: 1 },
+            { t: L("Keilriemen gerissen / Motor defekt", "Drive belt snapped / motor faulty"), w: L("Ventilator dreht nicht. Ersatzteil nötig.", "Fan not turning. Spare part needed."), p: 2, k: 2 },
+            { t: L("Brandschutzklappe ausgelöst", "Fire damper closed"), w: L("Nach Alarm schließen Klappen automatisch. Müssen zurückgesetzt werden.", "After an alarm the dampers shut automatically. They need resetting."), p: 1, k: 1 }] },
+      { id: "smell", sev: "green", l: L("Schlechte Luft / Geruch", "Stale air / smell"),
+        q: [L("Seit wann? Riecht es muffig oder verbrannt?", "Since when? Musty or burnt smell?")],
+        act: L("Bei Brandgeruch sofort Anlage aus und prüfen lassen. Sonst Wartung einplanen.", "If it smells burnt, switch off and get it checked at once. Otherwise plan a service."),
+        c: [{ t: L("Filter oder Kanäle verschmutzt", "Dirty filters or ducts"), w: L("Hygienemangel. Reinigung und Filterwechsel.", "Hygiene issue. Cleaning and filter change."), p: 3, k: 2 }] }
+    ]
+  },
+  aircon: {
+    code: "KLI", trade: "hvac",
+    name: L("Klimaanlage / Split-Gerät", "Air conditioning / split unit"),
+    what: L("Kühlt Räume mit einem Kältekreis: Innengerät an der Wand oder Decke, Außengerät draußen.", "Cools rooms with a refrigerant circuit: indoor unit on the wall or ceiling, outdoor unit outside."),
+    insp: [{ l: L("Wartung + Dichtheitsprüfung (F-Gase, je nach Füllmenge)", "Service + leak check (F-gas, depends on charge)"), m: 12 }],
+    sym: [
+      { id: "no_cool", sev: "amber", l: L("Kühlt nicht", "Not cooling"),
+        q: [L("Bläst das Gerät warme Luft?", "Is it blowing warm air?"), L("Fehlercode oder blinkende Lampe?", "Error code or blinking light?"), L("Läuft das Außengerät?", "Is the outdoor unit running?")],
+        act: L("Bei Serverraum: sofort Notdienst. Sonst Klimafirma diese Woche.", "Server room: emergency service at once. Otherwise AC firm this week."),
+        c: [{ t: L("Filter im Innengerät verschmutzt", "Indoor filter dirty"), w: L("Einfachste Ursache, Reinigung.", "Simplest cause, cleaning."), p: 3, k: 1 },
+            { t: L("Kältemittel verloren (Leck)", "Refrigerant lost (leak)"), w: L("Nur zertifizierte Kältetechniker. Teurer.", "Certified technicians only. More expensive."), p: 2, k: 3 },
+            { t: L("Außengerät blockiert oder verschmutzt", "Outdoor unit blocked or dirty"), w: L("Laub, Schmutz. Luft kann nicht abgeführt werden.", "Leaves, dirt. Heat cannot escape."), p: 2, k: 1 }] },
+      { id: "drip", sev: "green", l: L("Wasser tropft aus dem Innengerät", "Water dripping from indoor unit"),
+        q: [L("Stark oder nur einzelne Tropfen?", "Heavy or just a few drops?")],
+        act: L("Eimer unterstellen, Klimafirma beauftragen.", "Put a bucket under it, book the AC firm."),
+        c: [{ t: L("Kondensatpumpe / Ablauf verstopft", "Condensate pump / drain blocked"), w: L("Beim Kühlen entsteht Wasser. Ist der Ablauf zu, tropft es.", "Cooling produces water. If the drain is blocked, it drips."), p: 3, k: 1 }] }
+    ]
+  },
+  roller_door: {
+    code: "TOR", trade: "doors",
+    name: L("Rolltor / Sektionaltor", "Roller door / sectional door"),
+    what: L("Große elektrische Tore für Hallen und Rampen. Mit Motor, Federn zum Gewichtsausgleich und Sicherheitstechnik (Lichtschranke, Schließkante).", "Large electric doors for halls and loading bays. With a motor, springs to balance the weight and safety devices (photo cell, safety edge)."),
+    insp: [{ l: L("Jährliche Prüfung durch Sachkundigen (ASR A1.7)", "Annual inspection by a competent person (ASR A1.7)"), m: 12 }],
+    sym: [
+      { id: "stuck", sev: "amber", l: L("Tor öffnet oder schließt nicht", "Door won't open or close"),
+        q: [L("Bewegt es sich gar nicht oder fährt es zurück?", "Does it not move at all, or does it reverse?"), L("Leuchtet eine Störungslampe an der Steuerung?", "Is a fault light on at the control box?"), L("Hängt das Tor schief oder hört man ein Knallen?", "Is the door hanging crooked, or was there a bang?")],
+        act: L("Kann die Halle nachts nicht verschlossen werden: am selben Tag Torfirma (Sicherheit, Versicherung).", "If the hall cannot be locked at night: door firm the same day (security, insurance)."),
+        c: [{ t: L("Lichtschranke verschmutzt oder verstellt", "Photo cell dirty or misaligned"), w: L("Das Tor denkt, etwas steht im Weg, und fährt zurück. Sensoren abwischen lassen.", "The door thinks something is in the way and reverses. Have the sensors wiped."), p: 3, k: 1 },
+            { t: L("Schließkantensicherung ausgelöst / defekt", "Safety edge triggered / faulty"), w: L("Gummileiste unten am Tor, oft durch Anfahrschaden beschädigt.", "Rubber strip at the bottom, often damaged by a vehicle."), p: 2, k: 2 },
+            { t: L("Torfeder gebrochen", "Door spring broken"), w: L("Gefährlich, das Tor ist sehr schwer. Nicht mehr bewegen, Bereich sperren.", "Dangerous, the door is very heavy. Do not move it, block off the area."), p: 2, k: 2 },
+            { t: L("Motor überhitzt / Thermoschutz", "Motor overheated / thermal cut-out"), w: L("Nach sehr vielen Fahrten. Abkühlen lassen, dann geht es wieder.", "After many cycles. Let it cool, then it works again."), p: 1, k: 1 }] },
+      { id: "crash", sev: "red", l: L("Anfahrschaden / Tor hängt", "Vehicle damage / door hanging"),
+        act: L("Bereich absperren, niemand unter das Tor. Torfirma Notdienst. Fotos und Verursacher notieren (Versicherung).", "Block off the area, no one under the door. Door firm emergency service. Take photos and note who caused it (insurance)."),
+        q: [L("Wer ist angefahren (Firma, Kennzeichen)?", "Who hit it (company, plate number)?"), L("Kann das Tor noch geschlossen werden?", "Can the door still be closed?")],
+        c: [{ t: L("Mechanischer Schaden an Lamellen / Führung", "Mechanical damage to panels / rails"), w: L("Kosten trägt meist der Verursacher bzw. dessen Versicherung.", "The cost is usually paid by whoever caused it or their insurance."), p: 3, k: 3 }] }
+    ]
+  },
+  dock_leveller: {
+    code: "ÜLB", trade: "doors",
+    name: L("Überladebrücke", "Dock leveller"),
+    what: L("Hydraulische Rampe, die den Spalt zwischen Halle und LKW-Ladefläche überbrückt.", "Hydraulic ramp that bridges the gap between the warehouse and the truck bed."),
+    insp: [{ l: L("Jährliche Prüfung durch Sachkundigen", "Annual inspection by a competent person"), m: 12 }],
+    sym: [
+      { id: "no_lift", sev: "amber", l: L("Hebt nicht / Lippe fährt nicht aus", "Won't lift / lip won't extend"),
+        q: [L("Ist der Not-Halt gedrückt?", "Is the emergency stop pressed?"), L("Ölfleck unter der Brücke?", "Oil stain under the leveller?")],
+        act: L("Rampe sperren. Torfirma beauftragen, Mieter auf andere Rampe ausweichen lassen.", "Close the bay. Book the door firm, tenant uses another bay."),
+        c: [{ t: L("Not-Halt gedrückt / Sicherung", "Emergency stop pressed / fuse"), w: L("Not-Halt-Taster herausziehen bzw. Sicherung prüfen.", "Pull out the emergency stop or check the fuse."), p: 2, k: 1 },
+            { t: L("Hydrauliköl verloren", "Hydraulic oil lost"), w: L("Undichter Schlauch oder Zylinder.", "Leaking hose or cylinder."), p: 2, k: 2 },
+            { t: L("Hydraulikpumpe / Motor defekt", "Hydraulic pump / motor faulty"), w: L("Ersatzteil nötig.", "Spare part needed."), p: 1, k: 3 }] }
+    ]
+  },
+  fire_alarm: {
+    code: "BMA", trade: "fire",
+    name: L("Brandmeldeanlage (BMA)", "Fire alarm system"),
+    what: L("Melder in den Räumen erkennen Rauch oder Hitze, die Zentrale löst Alarm aus und ruft oft direkt die Feuerwehr.", "Detectors in the rooms sense smoke or heat, the panel raises the alarm and often calls the fire brigade directly."),
+    insp: [{ l: L("Inspektion vierteljährlich, Wartung jährlich (DIN 14675 / VDE 0833)", "Inspection quarterly, service yearly (DIN 14675 / VDE 0833)"), m: 3 }],
+    sym: [
+      { id: "fault", sev: "amber", l: L("Störungsanzeige an der Zentrale", "Fault shown on the panel"),
+        q: [L("Was steht genau im Display?", "What exactly does the display say?"), L("Piept die Zentrale?", "Is the panel beeping?")],
+        act: L("Errichterfirma noch heute anrufen. Eine gestörte BMA kann im Brandfall versagen.", "Call the installer today. A faulty alarm may fail in a fire."),
+        c: [{ t: L("Leitungs- oder Melderstörung", "Line or detector fault"), w: L("Ein Melder ist verschmutzt, abgezogen oder die Leitung unterbrochen.", "A detector is dirty, removed or a cable is broken."), p: 3, k: 2 },
+            { t: L("Akku der Zentrale schwach", "Panel battery weak"), w: L("Notstrom-Akkus halten ca. 4 Jahre.", "Backup batteries last about 4 years."), p: 2, k: 1 }] },
+      { id: "false_alarm", sev: "amber", l: L("Fehlalarm (Feuerwehr kam ohne Brand)", "False alarm (fire brigade came, no fire)"),
+        q: [L("Was wurde vor dem Alarm gemacht (Staub, Schweißen, Dampf, Kochen)?", "What was going on before the alarm (dust, welding, steam, cooking)?")],
+        act: L("Ursache dokumentieren. Fehlalarme kosten Gebühren, bei Mietern ggf. weiterberechnen.", "Document the cause. False alarms cost fees, possibly recharge to the tenant."),
+        c: [{ t: L("Staub / Dampf am Melder", "Dust / steam at the detector"), w: L("Arbeiten ohne vorherige Abschaltung des Melders.", "Work done without switching the detector off first."), p: 3, k: 1 }] }
+    ]
+  },
+  sprinkler: {
+    code: "SPR", trade: "fire",
+    name: L("Sprinkleranlage", "Sprinkler system"),
+    what: L("Rohrnetz mit Sprinkler-Köpfen an der Decke. Bei Hitze öffnet ein Kopf und löscht mit Wasser.", "Pipe network with sprinkler heads on the ceiling. When hot, a head opens and sprays water."),
+    insp: [{ l: L("Prüfung durch Sachverständigen (halbjährlich, VdS), wöchentliche Eigenkontrolle", "Expert inspection (half-yearly, VdS), weekly own checks"), m: 6 }],
+    sym: [
+      { id: "alarm", sev: "red", l: L("Alarmglocke läutet / Wasser läuft", "Alarm bell ringing / water flowing"),
+        act: L("Prüfen lassen, ob es brennt (112). Ohne Brand: Sprinklerfirma Notdienst, Wasserschaden begrenzen. Ventile nur auf Anweisung schließen.", "Check whether there is a fire (112). No fire: sprinkler firm emergency, limit water damage. Only close valves when told to."),
+        q: [L("Brennt es oder ist es nur Wasser?", "Is there a fire or only water?")],
+        c: [{ t: L("Sprinklerkopf beschädigt (z. B. Stapler)", "Sprinkler head damaged (e.g. forklift)"), w: L("Gegen den Kopf gefahren. Kosten beim Verursacher.", "Something hit the head. Cost goes to whoever caused it."), p: 3, k: 3 }] }
+    ]
+  },
+  rwa: {
+    code: "RWA", trade: "fire",
+    name: L("Rauch- und Wärmeabzug (RWA)", "Smoke and heat vents"),
+    what: L("Klappen oder Fenster im Dach, die bei Brand öffnen, damit der Rauch abzieht.", "Flaps or windows in the roof that open in a fire so smoke can escape."),
+    insp: [{ l: L("Jährliche Wartung", "Annual service"), m: 12 }],
+    sym: [
+      { id: "open", sev: "amber", l: L("Klappe offen, schließt nicht", "Vent open, won't close"),
+        q: [L("Regnet es hinein?", "Is rain coming in?"), L("Leuchtet am RWA-Taster eine Störung?", "Is there a fault light on the vent button?")],
+        act: L("Bei Regen am selben Tag RWA-Firma. Wasserschaden vermeiden.", "If it rains, vent firm the same day. Prevent water damage."),
+        c: [{ t: L("Wind-/Regensensor oder Antrieb defekt", "Wind/rain sensor or actuator faulty"), w: L("Der Motor oder Sensor schließt die Klappe nicht mehr.", "The motor or sensor no longer closes the vent."), p: 3, k: 2 }] }
+    ]
+  },
+  emergency_light: {
+    code: "SIB", trade: "electrical",
+    name: L("Sicherheitsbeleuchtung / Notlicht", "Emergency lighting"),
+    what: L("Leuchten und grüne Fluchtwegschilder, die bei Stromausfall mit Akku weiterleuchten.", "Lights and green exit signs that keep working on battery during a power cut."),
+    insp: [{ l: L("Jährliche Prüfung, monatlicher Funktionstest", "Annual inspection, monthly function test"), m: 12 }],
+    sym: [
+      { id: "out", sev: "green", l: L("Notleuchte aus / Fehler im Test", "Emergency light out / test failed"),
+        q: [L("Wie viele Leuchten, in welchem Bereich?", "How many lights, in which area?")],
+        act: L("Elektriker zeitnah. Bei vielen ausgefallenen Leuchten im Fluchtweg: dringend.", "Electrician soon. Urgent if many lights on an escape route are out."),
+        c: [{ t: L("Akku verbraucht", "Battery worn out"), w: L("Akkus halten wenige Jahre.", "Batteries last a few years."), p: 3, k: 1 }] }
+    ]
+  },
+  elevator: {
+    code: "AUF", trade: "lift",
+    name: L("Aufzug", "Lift / elevator"),
+    what: L("Personen- oder Lastenaufzug. Hat einen Notruf, der rund um die Uhr bei der Aufzugsfirma ankommt.", "Passenger or goods lift. Has an emergency call that reaches the lift company 24/7."),
+    insp: [{ l: L("Hauptprüfung durch ZÜS alle 2 Jahre, Zwischenprüfung dazwischen", "Main inspection by approved body every 2 years, interim check in between"), m: 12 }],
+    sym: [
+      { id: "trapped", sev: "red", l: L("Person steckt im Aufzug fest", "Person trapped in the lift"),
+        act: L("Aufzugsfirma Notdienst (Nummer steht in der Kabine). Personen niemals selbst befreien. Bei Panik oder Gesundheitsproblem 112.", "Lift firm emergency (number is in the car). Never free people yourself. If panic or health problem: 112."),
+        q: [L("Wie viele Personen, geht es allen gut?", "How many people, is everyone OK?"), L("Zwischen welchen Etagen?", "Between which floors?")],
+        c: [{ t: L("Sicherheitskreis unterbrochen (Tür, Schalter)", "Safety circuit interrupted (door, switch)"), w: L("Der Aufzug stoppt bei jedem Sicherheitsproblem. Nur die Aufzugsfirma darf ihn wieder in Betrieb nehmen.", "The lift stops at any safety issue. Only the lift firm may restart it."), p: 3, k: 2 }] },
+      { id: "out_of_service", sev: "amber", l: L("Aufzug außer Betrieb", "Lift out of service"),
+        q: [L("Stoppt er mit offener Tür oder gar nicht?", "Does it stop with the door open or not at all?")],
+        act: L("Aufzugsfirma heute. Mieter informieren, besonders bei Barrierefreiheit.", "Lift firm today. Inform tenants, especially about accessibility."),
+        c: [{ t: L("Türkontakt / Lichtvorhang verschmutzt", "Door contact / light curtain dirty"), w: L("Häufigste Ursache.", "Most common cause."), p: 3, k: 1 }] }
+    ]
+  },
+  lifting_station: {
+    code: "HEB", trade: "heating",
+    name: L("Hebeanlage", "Sewage lifting station"),
+    what: L("Pumpt Abwasser aus tiefen Kellern nach oben in den Kanal. Fällt sie aus, droht Rückstau im Keller.", "Pumps waste water from low basements up into the sewer. If it fails, sewage can back up into the basement."),
+    insp: [{ l: L("Wartung alle 3 Monate bei Gewerbe (DIN EN 12056-4)", "Service every 3 months for commercial use (DIN EN 12056-4)"), m: 3 }],
+    sym: [
+      { id: "alarm", sev: "red", l: L("Alarm / Hochwasser-Warnung", "Alarm / high water warning"),
+        act: L("Wasser sparen (keine Toiletten, Spülmaschinen). Sanitär- bzw. Pumpenfirma Notdienst.", "Save water (no toilets, dishwashers). Plumbing or pump firm emergency."),
+        q: [L("Steht schon Wasser im Raum?", "Is there already water on the floor?"), L("Brummt die Pumpe, läuft aber nichts ab?", "Does the pump hum without draining?")],
+        c: [{ t: L("Pumpe verstopft (Feuchttücher, Lappen)", "Pump clogged (wet wipes, rags)"), w: L("Häufigste Ursache. Firma reinigt die Pumpe.", "Most common cause. The firm cleans the pump."), p: 3, k: 2 },
+            { t: L("Schwimmerschalter klemmt", "Float switch stuck"), w: L("Die Pumpe merkt nicht, dass Wasser da ist.", "The pump doesn't notice there is water."), p: 2, k: 1 }] }
+    ]
+  },
+  oil_separator: {
+    code: "LFA", trade: "disposal",
+    name: L("Leichtflüssigkeitsabscheider", "Oil / fuel separator"),
+    what: L("Hält Öl und Benzin aus dem Regenwasser von Hof- und Parkflächen zurück, bevor es in den Kanal geht.", "Holds back oil and fuel from yard and parking rainwater before it reaches the sewer."),
+    insp: [{ l: L("Halbjährliche Wartung, Generalinspektion alle 5 Jahre", "Half-yearly service, general inspection every 5 years"), m: 6 }],
+    sym: [
+      { id: "full", sev: "amber", l: L("Warnanlage meldet „voll“", "Warning says „full“"),
+        q: [L("Leuchtet oder piept die Warnanlage?", "Is the warning device lit or beeping?")],
+        act: L("Entsorgungsfirma zum Absaugen bestellen. Nicht ignorieren (Umweltrecht).", "Order the disposal firm to pump it out. Do not ignore (environmental law)."),
+        c: [{ t: L("Ölschicht hat Grenze erreicht", "Oil layer at its limit"), w: L("Normaler Vorgang, Leerung fällig.", "Normal, emptying is due."), p: 3, k: 2 }] }
+    ]
+  },
+  electrical: {
+    code: "ELT", trade: "electrical",
+    name: L("Elektroverteilung & Strom", "Electrical distribution & power"),
+    what: L("Hauptverteiler und Unterverteiler mit Sicherungen und FI-Schutzschaltern verteilen den Strom im Gebäude.", "Main and sub distribution boards with fuses and RCDs distribute power in the building."),
+    insp: [{ l: L("Prüfung ortsfester Anlagen (DGUV V3, bei Gewerbe i. d. R. alle 4 Jahre)", "Fixed installation test (DGUV V3, commercial usually every 4 years)"), m: 48 }],
+    sym: [
+      { id: "power_out", sev: "amber", l: L("Strom in einem Bereich weg", "Power out in one area"),
+        q: [L("Ganze Halle oder nur einzelne Steckdosen?", "Whole hall or only some sockets?"), L("Sind Nachbargebäude auch betroffen?", "Are neighbouring buildings affected too?"), L("Ist im Verteiler ein Schalter nach unten gekippt?", "Has a switch in the board flipped down?")],
+        act: L("Eine Sicherung darf einmal wieder eingeschaltet werden. Fliegt sie erneut: Elektriker.", "A fuse may be switched back on once. If it trips again: electrician."),
+        c: [{ t: L("FI-Schutzschalter ausgelöst", "RCD tripped"), w: L("Schützt vor Stromschlag. Löst bei defektem Gerät oder Feuchtigkeit aus.", "Protects from electric shock. Trips on a faulty appliance or damp."), p: 3, k: 1 },
+            { t: L("Überlastete Sicherung", "Overloaded circuit breaker"), w: L("Zu viele Geräte an einem Stromkreis (Heizlüfter!).", "Too many devices on one circuit (fan heaters!)."), p: 2, k: 1 },
+            { t: L("Störung beim Netzbetreiber", "Grid operator outage"), w: L("Wenn Nachbarn auch keinen Strom haben.", "If the neighbours have no power either."), p: 1, k: 1 }] },
+      { id: "burning", sev: "red", l: L("Brandgeruch / Funken / warmer Verteiler", "Burning smell / sparks / hot board"),
+        act: L("Nicht anfassen. Wenn gefahrlos: Hauptschalter aus. Elektro-Notdienst, bei Rauch oder Feuer 112.", "Do not touch. If safe: main switch off. Emergency electrician, 112 if smoke or fire."),
+        q: [L("Raucht es oder sieht man Feuer?", "Is there smoke or fire?")],
+        c: [{ t: L("Lose Klemme / überhitztes Kabel", "Loose terminal / overheating cable"), w: L("Brandgefahr. Sofort fachkundig prüfen.", "Fire risk. Have it checked at once."), p: 3, k: 2 }] }
+    ]
+  },
+  roof: {
+    code: "DCH", trade: "roof",
+    name: L("Dach & Dachentwässerung", "Roof & roof drainage"),
+    what: L("Dachhaut, Rinnen und Dachabläufe. Flachdächer von Hallen haben Abläufe, die frei sein müssen.", "Roof covering, gutters and roof drains. Flat warehouse roofs have drains that must stay clear."),
+    insp: [{ l: L("Jährliche Dachbegehung + Abläufe reinigen", "Annual roof check + clean drains"), m: 12 }],
+    sym: [
+      { id: "leak", sev: "amber", l: L("Wasser kommt durchs Dach", "Water coming through the roof"),
+        q: [L("Nur bei starkem Regen oder dauernd?", "Only in heavy rain or all the time?"), L("Liegt Ware darunter (Schaden)?", "Is stock underneath (damage)?")],
+        act: L("Ware schützen, Eimer / Folie. Dachdecker diese Woche, bei viel Wasser sofort.", "Protect stock, buckets / sheeting. Roofer this week, immediately if a lot of water."),
+        c: [{ t: L("Dachablauf verstopft (Laub)", "Roof drain blocked (leaves)"), w: L("Wasser staut sich und läuft über Anschlüsse. Reinigen.", "Water pools and gets in at joints. Clean it."), p: 3, k: 1 },
+            { t: L("Beschädigte Dachbahn", "Damaged roof membrane"), w: L("Nach Sturm oder Alter. Dachdecker repariert die Stelle.", "After a storm or with age. The roofer patches it."), p: 2, k: 2 }] }
+    ]
+  }
+};
+
+const GLOSSARY = [
+  ["Brenner", "Burner", "Der Teil des Kessels, der die Flamme macht.", "The part of the boiler that makes the flame."],
+  ["Umwälzpumpe", "Circulation pump", "Pumpt das warme Heizungswasser durch alle Heizkörper.", "Pushes the hot heating water round all the radiators."],
+  ["Ausdehnungsgefäß (MAG)", "Expansion vessel", "Roter Kessel neben der Heizung. Fängt auf, dass warmes Wasser mehr Platz braucht.", "Red tank next to the boiler. Absorbs the extra volume when water heats up."],
+  ["Sicherheitsventil", "Safety valve", "Lässt Wasser ab, wenn der Druck zu hoch wird.", "Releases water when the pressure gets too high."],
+  ["Manometer", "Pressure gauge", "Zeigt den Wasserdruck der Heizung in bar.", "Shows the heating water pressure in bar."],
+  ["Vorlauf / Rücklauf", "Flow / return", "Vorlauf: warmes Wasser zum Heizkörper. Rücklauf: abgekühltes Wasser zurück.", "Flow: hot water going to the radiators. Return: cooled water coming back."],
+  ["Entlüften", "Bleeding (radiators)", "Luft aus dem Heizkörper lassen, damit er wieder warm wird.", "Letting air out of a radiator so it heats up again."],
+  ["Thermostatventil", "Thermostatic valve", "Drehknopf am Heizkörper, regelt die Raumtemperatur.", "The knob on the radiator that controls room temperature."],
+  ["Störung", "Fault", "Das Gerät hat einen Fehler erkannt und sich abgeschaltet.", "The unit detected a problem and switched off."],
+  ["Entstörtaste / Reset", "Reset button", "Taste zum Neustart nach einer Störung. Nur einmal drücken.", "Button to restart after a fault. Press it once only."],
+  ["Verriegelung", "Lockout", "Sicherheitssperre. Das Gerät startet nicht von allein.", "Safety lock. The unit won't restart by itself."],
+  ["Kondensat / Siphon", "Condensate / drain trap", "Wasser, das im Brennwertkessel entsteht, und sein Ablauf.", "Water produced in a condensing boiler, and its drain."],
+  ["Hydraulischer Abgleich", "Hydraulic balancing", "Einstellung, damit jeder Heizkörper genug Wasser bekommt.", "Setting so every radiator gets enough water."],
+  ["Wärmetauscher", "Heat exchanger", "Gibt Wärme von einem Wasserkreis an einen anderen weiter, ohne sie zu mischen.", "Passes heat from one water circuit to another without mixing them."],
+  ["Brennwert", "Condensing (technology)", "Moderne Kessel, die auch die Wärme im Abgas nutzen.", "Modern boilers that also use the heat in the exhaust gas."],
+  ["EVU-Sperre", "Utility block", "Der Stromversorger darf die Wärmepumpe kurz abschalten.", "The power company may switch off the heat pump for a short time."],
+  ["Heizstab", "Electric heating element", "Elektrische Zusatzheizung, teuer im Betrieb.", "Electric backup heater, expensive to run."],
+  ["Kältemittel", "Refrigerant", "Das Gas im Kältekreis von Klima und Wärmepumpe.", "The gas in the cooling circuit of AC units and heat pumps."],
+  ["Legionellen", "Legionella", "Bakterien im warmen Trinkwasser, gefährlich beim Einatmen (Dusche).", "Bacteria in warm drinking water, dangerous when inhaled (showers)."],
+  ["Hauptabsperrhahn", "Main stop valve", "Dreht das Wasser für das ganze Gebäude ab, meist beim Wasserzähler.", "Turns off water for the whole building, usually by the water meter."],
+  ["Rohrbruch", "Burst pipe", "Ein Wasserrohr ist kaputt und Wasser tritt aus.", "A water pipe is broken and leaking."],
+  ["Rückstau", "Sewage backflow", "Abwasser drückt aus dem Kanal zurück ins Gebäude.", "Sewage pushes back from the sewer into the building."],
+  ["Hebeanlage", "Lifting station", "Pumpe, die Abwasser aus dem Keller nach oben pumpt.", "Pump that lifts waste water up from the basement."],
+  ["Abscheider", "Separator", "Behälter, der Öl oder Fett aus dem Abwasser zurückhält.", "Tank that holds oil or grease back from waste water."],
+  ["FI-Schutzschalter (RCD)", "RCD / residual current device", "Schaltet bei Fehlerstrom sofort ab, schützt Menschen.", "Cuts power instantly on a leakage current, protects people."],
+  ["Sicherung / LS-Schalter", "Fuse / circuit breaker", "Schaltet einen Stromkreis bei Überlast ab.", "Switches off a circuit when overloaded."],
+  ["Unterverteilung", "Sub distribution board", "Sicherungskasten für einen Gebäudeteil.", "Fuse board for one part of the building."],
+  ["Lichtschranke", "Photo cell", "Sensor am Tor, erkennt Hindernisse.", "Sensor at the door that detects obstacles."],
+  ["Schließkantensicherung", "Safety edge", "Gummileiste unten am Tor, stoppt beim Berühren.", "Rubber strip at the bottom of a door, stops it on contact."],
+  ["Torfeder", "Door spring", "Feder, die das Gewicht des Tores ausgleicht.", "Spring that balances the door's weight."],
+  ["Überladebrücke", "Dock leveller", "Rampe zwischen Halle und LKW.", "Ramp between warehouse and truck."],
+  ["Brandmeldeanlage (BMA)", "Fire alarm system", "Melder und Zentrale, die bei Feuer Alarm geben.", "Detectors and a panel that sound the alarm in a fire."],
+  ["Fehlalarm", "False alarm", "Alarm ohne Brand. Kann Feuerwehrgebühren kosten.", "Alarm without a fire. Can cost fire brigade fees."],
+  ["RWA", "Smoke vents", "Rauch- und Wärmeabzug im Dach.", "Smoke and heat vents in the roof."],
+  ["Sicherheitsbeleuchtung", "Emergency lighting", "Licht für Fluchtwege bei Stromausfall.", "Light for escape routes during a power cut."],
+  ["Prüfbuch", "Inspection log", "Buch oder Ordner mit allen Prüfungen einer Anlage.", "Book or file with all inspections of a system."],
+  ["Wartungsvertrag", "Maintenance contract", "Vertrag für regelmäßige Wartung zum festen Preis.", "Contract for regular service at a fixed price."],
+  ["Kostenvoranschlag (KVA)", "Cost estimate", "Unverbindliche Schätzung der Kosten.", "Non-binding cost estimate."],
+  ["Angebot", "Quote", "Verbindlicher Preis für eine Leistung.", "Binding price for a job."],
+  ["Anfahrtspauschale", "Call-out fee", "Fester Betrag für die Anfahrt des Technikers.", "Fixed charge for the technician to come out."],
+  ["Notdienstzuschlag", "Emergency surcharge", "Aufschlag für Einsätze nachts oder am Wochenende.", "Extra charge for nights or weekends."],
+  ["Gewährleistung", "Warranty (legal)", "Gesetzliche Haftung für Mängel, meist 2 Jahre (Bau: 5).", "Legal liability for defects, usually 2 years (construction: 5)."],
+  ["Typenschild", "Type plate / rating plate", "Metallschild am Gerät mit Hersteller, Modell, Baujahr.", "Metal plate on a unit with maker, model, year."],
+  ["Baujahr", "Year of manufacture", "Wann das Gerät gebaut wurde.", "When the unit was built."],
+  ["Mängelanzeige", "Defect notice", "Schriftliche Meldung eines Mangels.", "Written report of a defect."],
+  ["Nebenkosten / Betriebskosten", "Service charges", "Laufende Kosten, die auf Mieter umgelegt werden.", "Running costs passed on to tenants."],
+  ["Instandhaltung / Instandsetzung", "Maintenance / repair", "Erhalten vs. Reparieren. Wichtig für die Kostenverteilung.", "Keeping in shape vs. repairing. Matters for who pays."],
+  ["Sachkundiger", "Competent person", "Fachmann, der eine Anlage prüfen darf.", "Expert allowed to inspect a system."],
+  ["ZÜS", "Approved inspection body", "Zugelassene Überwachungsstelle, z. B. TÜV, DEKRA.", "Approved inspection body, e.g. TÜV, DEKRA."]
+];
+
+</script>
+<script>
+"use strict";
+const APP_URL = "https://claude.ai/artifact/3NRcXCaMXsrBmcqN9ujNja";
+const COLS = ["properties", "machines", "contractors", "tickets", "inspections"];
+const S = { properties: {}, machines: {}, contractors: {}, tickets: {}, inspections: {}, settings: { limit: 500 } };
+const loaded = {};
+let db = null, sample = null, assets = null, downloads = null, imgOK = false;
+let mode = "connecting"; // connecting | db | local
+let lang = "de";
+try { lang = localStorage.getItem("ol-lang") || "de"; } catch (e) {}
+const CALL = { prop: "", machine: "", cat: "", sym: "", text: "", ai: null, busy: false, checked: {} };
+let ticketFilter = "open";
+let glossQ = "";
+let catOpen = "";
+
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const tl = (de, en) => lang === "en" ? en : de;
+const tr = o => o ? (o[lang] || o.de || "") : "";
+const uid = () => Math.random().toString(36).slice(2, 10);
+const today = () => new Date().toISOString().slice(0, 10);
+const money = n => new Intl.NumberFormat(lang === "en" ? "en-GB" : "de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(Number(n) || 0);
+const fmtDate = d => { if (!d) return "–"; const x = new Date(d + "T12:00:00"); return isNaN(x) ? d : x.toLocaleDateString(lang === "en" ? "en-GB" : "de-DE", { day: "2-digit", month: "short", year: "numeric" }); };
+const addMonths = (d, m) => { const x = new Date((d || today()) + "T12:00:00"); x.setMonth(x.getMonth() + Number(m || 12)); return x.toISOString().slice(0, 10); };
+const daysUntil = d => Math.round((new Date(d + "T12:00:00") - new Date(today() + "T12:00:00")) / 864e5);
+const blob = id => id ? "/_blob/" + id : "";
+const vals = col => Object.entries(S[col]).map(([id, v]) => ({ id, ...v }));
+
+function toast(msg) {
+  const r = $("#toast-root");
+  r.innerHTML = `<div class="toast" role="status">${esc(msg)}</div>`;
+  clearTimeout(toast._t); toast._t = setTimeout(() => r.innerHTML = "", 3200);
+}
+
+/* ---------- Daten ---------- */
+async function save(col, id, data) {
+  S[col][id] = data; render();
+  if (mode !== "db") return;
+  try { await db.collection(col).doc(id).set(JSON.parse(JSON.stringify(data))); }
+  catch (e) { toast(tl("Speichern fehlgeschlagen: ", "Saving failed: ") + (e.message || e.code)); }
+}
+async function patch(col, id, changes) { const cur = S[col][id] || {}; return save(col, id, { ...cur, ...changes }); }
+async function remove(col, id) {
+  delete S[col][id]; render();
+  if (mode !== "db") return;
+  try { await db.collection(col).doc(id).delete(); } catch (e) { toast(tl("Löschen fehlgeschlagen", "Delete failed")); }
+}
+async function saveSettings(ch) {
+  S.settings = { ...S.settings, ...ch }; render();
+  if (mode === "db") { try { await db.doc("settings/main").set(JSON.parse(JSON.stringify(S.settings))); } catch (e) { toast(tl("Speichern fehlgeschlagen", "Saving failed")); } }
+}
+
+async function boot() {
+  render();
+  const use = n => (window.claude && window.claude.use) ? window.claude.use(n).catch(() => null) : Promise.resolve(null);
+  use("sample").then(async s => { sample = s; if (s) { const lim = await s.limits().catch(() => null); imgOK = !!(lim && lim.images); } render(); });
+  use("assets").then(a => { assets = a; render(); });
+  use("downloads").then(d => { downloads = d; render(); });
+  db = await use("db");
+  if (!db) { mode = "local"; COLS.forEach(c => loaded[c] = true); render(); return; }
+  mode = "db";
+  COLS.forEach(col => db.collection(col).onSnapshot(snap => {
+    const next = {}; snap.docs.forEach(d => next[d.id] = { ...d.data() });
+    S[col] = next; loaded[col] = true; render();
+  }, err => { loaded[col] = true; toast(tl("Daten konnten nicht geladen werden", "Could not load data")); render(); }));
+  db.doc("settings/main").onSnapshot(d => { if (d.exists) S.settings = { limit: 500, ...d.data() }; render(); }, () => {});
+}
+
+/* ---------- Icons ---------- */
+const I = {
+  call: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 2h3l1.5 3.5L5.8 6.8a8 8 0 0 0 3.4 3.4l1.3-1.7L14 10v3a1 1 0 0 1-1 1A11 11 0 0 1 2 3a1 1 0 0 1 1-1z"/></svg>',
+  dash: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="3"/><rect x="9" y="7" width="5" height="7"/><rect x="2" y="9" width="5" height="5"/></svg>',
+  obj: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 14V6l6-4 6 4v8z"/><path d="M6 14v-4h4v4"/></svg>',
+  rep: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2a3 3 0 0 0-2.8 4.1L2 11.3 4.7 14l5.2-5.2A3 3 0 1 0 10 2z"/></svg>',
+  insp: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="3" width="12" height="11"/><path d="M2 6h12M5 1v3M11 1v3M5 10l2 2 4-4"/></svg>',
+  con: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="5" r="3"/><path d="M2 15c0-3 3-5 6-5s6 2 6 5"/></svg>',
+  cat: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="12" height="12" rx="1"/><circle cx="8" cy="8" r="2.5"/><path d="M8 2v3M8 11v3M2 8h3M11 8h3"/></svg>',
+  gl: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 2h8l2 2v10H3z"/><path d="M6 6h4M6 9h4"/></svg>'
+};
+
+/* ---------- Router ---------- */
+function route() { return (location.hash || "#dashboard").slice(1) || "dashboard"; }
+window.addEventListener("hashchange", () => { render(); window.scrollTo(0, 0); });
+
+function renderNav() {
+  const r = route();
+  const openRed = vals("tickets").filter(t => t.status !== "done").length;
+  const overdue = vals("inspections").filter(i => i.next && daysUntil(i.next) < 0).length;
+  const items = [
+    ["call", I.call, tl("Störung aufnehmen", "Log a fault"), "call"],
+    ["dashboard", I.dash, tl("Übersicht", "Overview")],
+    ["objects", I.obj, tl("Objekte", "Properties")],
+    ["tickets", I.rep, tl("Reparaturen", "Repairs"), "", openRed],
+    ["inspections", I.insp, tl("Prüfungen", "Inspections"), "", overdue],
+    ["contractors", I.con, tl("Dienstleister", "Contractors")],
+    ["catalog", I.cat, tl("Anlagen-Wissen", "Equipment guide")],
+    ["glossary", I.gl, tl("Wörterbuch", "Glossary")]
+  ];
+  const active = r.startsWith("p-") ? "objects" : r.startsWith("m-") ? "objects" : r;
+  $("#nav").innerHTML = items.map(([k, ic, label, cls, cnt]) =>
+    `<a href="#${k}" class="${cls || ""} ${active === k ? "on" : ""}">${ic}<span>${esc(label)}</span>${cnt ? `<span class="cnt">${cnt}</span>` : ""}</a>`).join("");
+  $("#lang-de").classList.toggle("on", lang === "de");
+  $("#lang-en").classList.toggle("on", lang === "en");
+  $("#mode").textContent = mode === "db" ? tl("Gespeichert in deinem Konto", "Saved to your account") : mode === "local" ? tl("Vorschau – nichts wird gespeichert", "Preview – nothing is saved") : tl("Verbinde…", "Connecting…");
+  document.documentElement.lang = lang;
+}
+
+function render() {
+  renderNav();
+  const r = route();
+  const v = $("#view");
+  const ready = COLS.every(c => loaded[c]);
+  let html = "";
+  if (mode === "local") html += `<div class="banner">${tl("Vorschau-Modus: Diese Ansicht kann keine Daten speichern. Öffne die App angemeldet in Claude, damit deine Objekte gespeichert werden.", "Preview mode: this view can't save data. Open the app signed in to Claude so your properties are saved.")}</div>`;
+  if (!ready) { v.innerHTML = html + `<div class="empty"><span class="spin"></span><br>${tl("Lade Daten…", "Loading data…")}</div>`; return; }
+  if (r === "call") html += viewCall();
+  else if (r === "objects") html += viewObjects();
+  else if (r.startsWith("p-")) html += viewProperty(r.slice(2));
+  else if (r.startsWith("m-")) html += viewMachine(r.slice(2));
+  else if (r === "tickets") html += viewTickets();
+  else if (r === "inspections") html += viewInspections();
+  else if (r === "contractors") html += viewContractors();
+  else if (r === "catalog") html += viewCatalog();
+  else if (r === "glossary") html += viewGlossary();
+  else html += viewDashboard();
+  v.innerHTML = html;
+  afterRender(r);
+}
+
+/* ---------- Helfer für Anzeige ---------- */
+const sevPill = s => s ? `<span class="sev ${s}">${esc(tr(SEV[s].label))}</span>` : "";
+const catOf = m => CATALOG[m && m.cat] || null;
+const machineName = m => m ? (m.name || tr(catOf(m)?.name) || tl("Anlage", "Equipment")) : "";
+const propName = id => S.properties[id]?.name || tl("Unbekanntes Objekt", "Unknown property");
+const STATUS = { open: L("Offen", "Open"), assigned: L("Beauftragt", "Assigned"), waiting: L("Wartet auf Angebot", "Waiting for quote"), done: L("Erledigt", "Done") };
+const meter = (n, max = 3) => `<span class="meter" aria-label="${n}/${max}">${Array.from({ length: max }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</span>`;
+const costSigns = k => "€".repeat(k || 1);
+const inspTitle = i => i.titleL ? tr(i.titleL) : i.title;
+const example = o => o && o.example ? ` <span class="tag">${tl("Beispiel", "Example")}</span>` : "";
+
+function contractorsFor(trade, machine) {
+  const list = [];
+  if (machine && machine.contractorId && S.contractors[machine.contractorId]) list.push({ id: machine.contractorId, ...S.contractors[machine.contractorId], main: true });
+  vals("contractors").filter(c => c.trade === trade && !list.find(x => x.id === c.id)).forEach(c => list.push(c));
+  return list;
+}
+function contactCard(c) {
+  return `<div class="contact">
+    <div><div class="ttl" style="font-weight:700">${esc(c.name)}${c.main ? ` <span class="tag">${tl("zuständig", "assigned")}</span>` : ""}${c.emergency ? ` <span class="tag">24/7</span>` : ""}</div>
+    <div class="muted" style="font-size:13px">${esc(tr(TRADES[c.trade]) || "")}${c.notes ? " · " + esc(c.notes) : ""}</div></div>
+    <div class="row"><span class="phone">${esc(c.phone || "–")}</span>${c.phone ? `<button class="btn sm" data-copy="${esc(c.phone)}">${tl("Kopieren", "Copy")}</button>` : ""}</div>
+  </div>`;
+}
+
+/* ---------- Übersicht ---------- */
+function viewDashboard() {
+  const tickets = vals("tickets");
+  const open = tickets.filter(t => t.status !== "done");
+  const cnt = s => open.filter(t => t.severity === s).length;
+  const insp = vals("inspections").filter(i => i.next).sort((a, b) => a.next.localeCompare(b.next));
+  const due = insp.filter(i => daysUntil(i.next) <= 60);
+  const overdue = insp.filter(i => daysUntil(i.next) < 0).length;
+  const rent = vals("properties").reduce((s, p) => s + (Number(p.rent) || 0), 0);
+  const yr = new Date().getFullYear().toString();
+  const repairs = tickets.filter(t => (t.created || "").startsWith(yr)).reduce((s, t) => s + (Number(t.cost) || 0), 0);
+  const props = vals("properties");
+  if (!props.length) return `<div class="head"><div><div class="eyebrow">${tl("Übersicht", "Overview")}</div><h1>${tl("Willkommen im Objekt-Leitstand", "Welcome to your property control room")}</h1></div></div>
+    <div class="empty"><b>${tl("Noch keine Objekte", "No properties yet")}</b>${tl("Lege dein erstes Objekt an, dann füge seine Anlagen hinzu (Heizung, Tore, Brandmeldeanlage …).", "Add your first property, then add its equipment (heating, doors, fire alarm …).")}<br><br><button class="btn primary" data-act="new-prop">${tl("Objekt anlegen", "Add property")}</button></div>`;
+  return `
+  <div class="head"><div><div class="eyebrow">${tl("Übersicht", "Overview")} · ${fmtDate(today())}</div><h1>${open.length ? tl(`${open.length} offene Störungen`, `${open.length} open faults`) : tl("Alles ruhig", "All quiet")}</h1></div>
+    <a class="btn primary" href="#call">${I.call.replace('<svg', '<svg width="16" height="16"')} ${tl("Anruf: Störung aufnehmen", "Call: log a fault")}</a></div>
+  <div class="stats">
+    <div class="stat"><span class="eyebrow">${tl("Offene Störungen", "Open faults")}</span><b>${open.length}</b><span class="row" style="gap:6px">${cnt("red") ? sevPill("red") + " " + cnt("red") : ""} ${cnt("amber") ? sevPill("amber") + " " + cnt("amber") : ""} ${cnt("green") ? sevPill("green") + " " + cnt("green") : ""}</span></div>
+    <div class="stat"><span class="eyebrow">${tl("Prüfungen fällig (60 Tage)", "Inspections due (60 days)")}</span><b>${due.length}</b><span class="sub ${overdue ? "due-over" : ""}">${overdue ? tl(`${overdue} überfällig`, `${overdue} overdue`) : tl("nichts überfällig", "none overdue")}</span></div>
+    <div class="stat"><span class="eyebrow">${tl("Miete pro Monat", "Rent per month")}</span><b>${money(rent)}</b><span class="sub">${props.length} ${tl("Objekte", "properties")}</span></div>
+    <div class="stat"><span class="eyebrow">${tl("Reparaturkosten", "Repair costs")} ${yr}</span><b>${money(repairs)}</b><span class="sub">${tl("Freigabegrenze", "Approval limit")} ${money(S.settings.limit)}</span></div>
+  </div>
+  <div class="grid g2">
+    <section class="panel"><h2>${tl("Offene Störungen", "Open faults")}</h2>${open.length ? `<div class="list">${open.sort((a, b) => "rag".indexOf(a.severity?.[0]) - "rag".indexOf(b.severity?.[0])).slice(0, 8).map(ticketRow).join("")}</div>` : `<p class="muted">${tl("Keine offenen Störungen.", "No open faults.")}</p>`}</section>
+    <section class="panel"><h2>${tl("Nächste Prüfungen", "Upcoming inspections")}</h2>${insp.length ? `<div class="list">${insp.slice(0, 8).map(inspRow).join("")}</div>` : `<p class="muted">${tl("Noch keine Prüfungen eingetragen.", "No inspections yet.")}</p>`}</section>
+    <section class="panel"><h2>${tl("Objekte", "Properties")}</h2><div class="list">${props.map(p => {
+      const o = tickets.filter(t => t.propertyId === p.id && t.status !== "done").length;
+      return `<a class="item" href="#p-${p.id}"><span class="bar ${o ? "amber" : ""}"></span><span><span class="ttl">${esc(p.name)}</span>${example(p)}<br><span class="meta">${esc(p.tenant || "–")} · ${esc(p.address || "")}</span></span><span class="mono">${money(p.rent)}</span></a>`; }).join("")}</div></section>
+    <section class="panel"><h2>${tl("Einstellungen", "Preferences")}</h2>
+      <label class="field"><span>${tl("Freigabegrenze für Reparaturen (€)", "Approval limit for repairs (€)")}</span><input type="number" id="limit-input" min="0" step="50" value="${esc(S.settings.limit)}"></label>
+      <p class="muted" style="font-size:13px;margin:8px 0 0">${tl("Liegt ein Angebot darüber, verlangt die App ein zweites Angebot und hilft beim Verhandeln.", "Quotes above this ask for a second quote and get negotiation help.")}</p></section>
+  </div>`;
+}
+function ticketRow(t) {
+  const m = S.machines[t.machineId];
+  return `<div class="item" data-ticket="${t.id}"><span class="bar ${t.severity || ""}"></span><span><span class="ttl">${esc(t.title)}</span>${example(t)}<br><span class="meta">${esc(propName(t.propertyId))}${m ? " · " + esc(machineName(m)) : ""} · ${esc(tr(STATUS[t.status] || STATUS.open))}</span></span><span>${sevPill(t.severity)}</span></div>`;
+}
+function inspRow(i) {
+  const d = daysUntil(i.next); const cls = d < 0 ? "due-over" : d <= 30 ? "due-soon" : "";
+  const m = S.machines[i.machineId];
+  return `<div class="item" data-insp="${i.id}"><span class="bar ${d < 0 ? "red" : d <= 30 ? "amber" : ""}"></span><span><span class="ttl">${esc(inspTitle(i))}</span>${example(i)}<br><span class="meta">${esc(propName(i.propertyId))}${m ? " · " + esc(machineName(m)) : ""}</span></span><span class="mono ${cls}">${fmtDate(i.next)}</span></div>`;
+}
+
+/* ---------- Störung aufnehmen ---------- */
+function viewCall() {
+  const props = vals("properties");
+  const p = S.properties[CALL.prop];
+  const machines = vals("machines").filter(m => m.propertyId === CALL.prop);
+  const m = S.machines[CALL.machine];
+  const cat = CATALOG[CALL.cat];
+  const sym = cat?.sym.find(s => s.id === CALL.sym);
+  let h = `<div class="head"><div><div class="eyebrow">${tl("Anruf läuft", "Call in progress")}</div><h1>${tl("Störung aufnehmen", "Log a fault")}</h1></div>${CALL.prop ? `<button class="btn ghost" data-act="call-reset">${tl("Neu beginnen", "Start over")}</button>` : ""}</div><div class="steps">`;
+  h += `<section class="step"><div class="n">1 · ${tl("Welches Objekt?", "Which property?")}</div><div class="row">${props.length ? props.map(x => `<button class="chip ${CALL.prop === x.id ? "on" : ""}" data-call-prop="${x.id}">${esc(x.name)}</button>`).join("") : `<span class="muted">${tl("Noch keine Objekte.", "No properties yet.")}</span> <button class="btn sm" data-act="new-prop">${tl("Objekt anlegen", "Add property")}</button>`}</div>${p ? `<p class="muted" style="margin:8px 0 0;font-size:13px">${tl("Mieter", "Tenant")}: ${esc(p.tenant || "–")}${p.tenantContact ? " · " + esc(p.tenantContact) : ""}</p>` : ""}</section>`;
+  if (CALL.prop) {
+    h += `<section class="step"><div class="n">2 · ${tl("Welche Anlage?", "Which equipment?")}</div><div class="row">${machines.map(x => `<button class="chip ${CALL.machine === x.id ? "on" : ""}" data-call-machine="${x.id}"><span class="code">${esc(catOf(x)?.code || "")}</span>${esc(machineName(x))}${x.location ? ` <span class="muted" style="font-weight:400">· ${esc(x.location)}</span>` : ""}</button>`).join("")}</div>
+      <details style="margin-top:10px" ${!machines.length ? "open" : ""}><summary class="muted">${tl("Nicht in der Liste? Anlagentyp wählen", "Not listed? Pick a type")}</summary><div class="row" style="margin-top:8px">${Object.entries(CATALOG).map(([k, c]) => `<button class="chip ${!CALL.machine && CALL.cat === k ? "on" : ""}" data-call-cat="${k}"><span class="code">${c.code}</span>${esc(tr(c.name))}</button>`).join("")}</div></details></section>`;
+  }
+  if (cat) {
+    h += `<section class="step"><div class="n">3 · ${tl("Was sagt der Mieter?", "What does the tenant say?")}</div><div class="row">${cat.sym.map(s => `<button class="chip ${CALL.sym === s.id ? "on" : ""}" data-call-sym="${s.id}"><span class="sev ${s.sev}" style="padding:0;background:none"></span>${esc(tr(s.l))}</button>`).join("")}</div>
+      <label class="field" style="margin-top:12px"><span>${tl("Notizen / genaue Worte des Mieters", "Notes / the tenant's exact words")}</span><textarea id="call-text" placeholder="${tl("z. B. „Display zeigt F28, Druck 0,8 bar, Halle B kalt“", "e.g. „display shows F28, pressure 0.8 bar, hall B cold“")}">${esc(CALL.text)}</textarea></label></section>`;
+  }
+  if (sym) {
+    const sv = sym.sev;
+    h += `<section class="light ${sv}"><div class="lamp" aria-hidden="true"><i class="r"></i><i class="a"></i><i class="g"></i></div><div><div class="eyebrow">${tl("Einstufung", "Severity")}</div><h2>${esc(tr(SEV[sv].label))}</h2><p style="margin:6px 0 0">${esc(tr(sym.act) || tr(SEV[sv].hint))}</p></div></section>
+    <div class="grid g2">
+      <section class="panel"><h2>${tl("Diese Fragen jetzt stellen", "Ask these questions now")}</h2><ul class="qs">${sym.q.map((q, i) => `<li><label><input type="checkbox" data-q="${i}" ${CALL.checked[i] ? "checked" : ""}><span>${esc(tr(q))}</span></label></li>`).join("")}</ul></section>
+      <section class="panel"><h2>${tl("Wer muss kommen?", "Who should come?")}</h2><div class="callwho">${(() => { const cs = contractorsFor(cat.trade, m); return cs.length ? cs.slice(0, 3).map(contactCard).join("") : `<p class="muted">${tl("Kein Dienstleister für", "No contractor for")} „${esc(tr(TRADES[cat.trade]))}“ ${tl("hinterlegt.", "saved yet.")}</p><button class="btn sm" data-act="new-contr" data-trade="${cat.trade}">${tl("Dienstleister anlegen", "Add contractor")}</button>`; })()}</div></section>
+    </div>
+    <section class="panel"><h2>${tl("Mögliche Ursachen", "Likely causes")}</h2><div>${[...sym.c].sort((a, b) => b.p - a.p).map(c => `<div class="cause"><div>${meter(c.p)}</div><div><div style="font-weight:700">${esc(tr(c.t))} <span class="cost">${costSigns(c.k)}</span></div><div class="muted" style="font-size:14px">${esc(tr(c.w))}</div></div></div>`).join("")}</div>
+      <p class="muted" style="font-size:12px;margin:10px 0 0">${tl("Balken = wie wahrscheinlich · € = grobe Kostenklasse. Eine Ferndiagnose ersetzt keinen Techniker.", "Bars = how likely · € = rough cost class. A remote guess does not replace a technician.")}</p></section>`;
+  }
+  if (cat || CALL.text) h += aiDiagnosisBlock();
+  if (cat && CALL.prop) h += `<div class="row"><button class="btn primary" data-act="call-ticket">${tl("Reparatur-Ticket anlegen", "Create repair ticket")}</button><span class="muted" style="font-size:13px">${tl("Speichert Objekt, Anlage, Einstufung und deine Notizen.", "Saves property, equipment, severity and your notes.")}</span></div>`;
+  return h + `</div>`;
+}
+function aiDiagnosisBlock() {
+  if (!sample) return `<section class="panel muted" style="font-size:14px">${tl("KI-Diagnose ist in dieser Ansicht nicht verfügbar. Die Diagnose aus dem Anlagen-Wissen oben funktioniert trotzdem.", "AI diagnosis isn't available in this view. The guide-based diagnosis above still works.")}</section>`;
+  const a = CALL.ai;
+  return `<section class="ai"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">${tl("KI-Diagnose", "AI diagnosis")}</div><h3>${tl("Aus den genauen Worten des Mieters", "From the tenant's exact words")}</h3></div>
+    <button class="btn primary sm" data-act="call-ai" ${CALL.busy ? "disabled" : ""}>${CALL.busy ? `<span class="spin"></span> ${tl("Denkt nach…", "Thinking…")}` : tl("KI fragen", "Ask AI")}</button></div>
+    ${a ? `<div style="margin-top:12px" class="prose">
+      <p>${sevPill(a.severity)} <b>${esc(a.summary)}</b></p>
+      ${a.firstSteps?.length ? `<p class="eyebrow" style="margin-top:10px">${tl("Sofort tun", "Do now")}</p><ul>${a.firstSteps.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+      ${a.causes?.length ? `<p class="eyebrow">${tl("Wahrscheinliche Ursachen", "Likely causes")}</p>${a.causes.map(c => `<div class="cause"><div>${meter(Math.max(1, Math.min(3, Number(c.likelihood) || 1)))}</div><div><b>${esc(c.title)}</b><div class="muted" style="font-size:14px">${esc(c.explanation)}</div></div></div>`).join("")}` : ""}
+      ${a.questions?.length ? `<p class="eyebrow" style="margin-top:10px">${tl("Noch fragen", "Still ask")}</p><ul>${a.questions.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+      ${a.whoToCall ? `<p><b>${tl("Anrufen", "Call")}:</b> ${esc(a.whoToCall)}</p>` : ""}
+    </div>` : `<p class="muted" style="font-size:14px;margin:8px 0 0">${tl("Schreib oben auf, was der Mieter sagt (Fehlercode, Geräusch, seit wann). Die KI gibt eine verständliche Einschätzung.", "Write down what the tenant says above (error code, noise, since when). The AI gives a plain-language assessment.")}</p>`}
+  </section>`;
+}
+
+/* ---------- Objekte ---------- */
+function viewObjects() {
+  const props = vals("properties");
+  return `<div class="head"><div><div class="eyebrow">${props.length} ${tl("Objekte", "properties")}</div><h1>${tl("Objekte", "Properties")}</h1></div><button class="btn primary" data-act="new-prop">${tl("Objekt anlegen", "Add property")}</button></div>
+  ${props.length ? `<div class="grid g3">${props.map(p => {
+    const ms = vals("machines").filter(m => m.propertyId === p.id).length;
+    const op = vals("tickets").filter(t => t.propertyId === p.id && t.status !== "done").length;
+    return `<a class="panel prop-card" href="#p-${p.id}">${p.photoId ? `<img class="thumb" src="${blob(p.photoId)}" alt="">` : `<div class="ph">${esc((p.type || "").toUpperCase() || tl("KEIN FOTO", "NO PHOTO"))}</div>`}
+      <div><h2>${esc(p.name)}${example(p)}</h2><div class="muted" style="font-size:13px">${esc(p.address || "")}</div></div>
+      <div class="row" style="justify-content:space-between;font-size:13px"><span>${esc(p.tenant || "–")}</span><span class="mono">${money(p.rent)}</span></div>
+      <div class="row" style="gap:6px"><span class="tag">${ms} ${tl("Anlagen", "units")}</span>${op ? `<span class="sev amber">${op} ${tl("offen", "open")}</span>` : ""}</div></a>`; }).join("")}</div>`
+    : `<div class="empty"><b>${tl("Noch keine Objekte", "No properties yet")}</b>${tl("Lege dein erstes Objekt an.", "Add your first property.")}<br><br><button class="btn primary" data-act="new-prop">${tl("Objekt anlegen", "Add property")}</button></div>`}`;
+}
+function viewProperty(id) {
+  const p = S.properties[id];
+  if (!p) return `<div class="empty"><b>${tl("Objekt nicht gefunden", "Property not found")}</b><a href="#objects">${tl("Zur Liste", "Back to list")}</a></div>`;
+  const ms = vals("machines").filter(m => m.propertyId === id);
+  const ts = vals("tickets").filter(t => t.propertyId === id).sort((a, b) => (b.created || "").localeCompare(a.created || ""));
+  const is = vals("inspections").filter(i => i.propertyId === id).sort((a, b) => (a.next || "").localeCompare(b.next || ""));
+  const costYear = ts.filter(t => (t.created || "").startsWith(new Date().getFullYear().toString())).reduce((s, t) => s + (Number(t.cost) || 0), 0);
+  return `<div class="head"><div><div class="eyebrow"><a href="#objects">${tl("Objekte", "Properties")}</a> / ${esc(p.type || "")}</div><h1>${esc(p.name)}${example(p)}</h1><div class="muted">${esc(p.address || "")}</div></div>
+    <div class="row"><button class="btn" data-act="edit-prop" data-id="${id}">${tl("Bearbeiten", "Edit")}</button><button class="btn primary" data-act="new-machine" data-prop="${id}">${tl("Anlage hinzufügen", "Add equipment")}</button></div></div>
+  <div class="stats">
+    <div class="stat"><span class="eyebrow">${tl("Mieter", "Tenant")}</span><b style="font-size:18px">${esc(p.tenant || "–")}</b><span class="sub">${esc(p.tenantContact || "")}</span></div>
+    <div class="stat"><span class="eyebrow">${tl("Miete / Monat", "Rent / month")}</span><b>${money(p.rent)}</b><span class="sub">${p.leaseEnd ? tl("Vertrag bis ", "Lease until ") + fmtDate(p.leaseEnd) : ""}</span></div>
+    <div class="stat"><span class="eyebrow">${tl("Reparaturen dieses Jahr", "Repairs this year")}</span><b>${money(costYear)}</b><span class="sub">${ts.length} ${tl("Tickets gesamt", "tickets total")}</span></div>
+    <div class="stat"><span class="eyebrow">${tl("Fläche", "Area")}</span><b>${p.area ? esc(p.area) + " m²" : "–"}</b><span class="sub">${ms.length} ${tl("Anlagen", "units")}</span></div>
+  </div>
+  ${p.photoId ? `<img class="thumb" style="max-height:260px;margin-bottom:18px" src="${blob(p.photoId)}" alt="">` : ""}
+  <section style="margin-bottom:22px"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2>${tl("Anlagen", "Equipment")}</h2></div>
+    ${ms.length ? `<div class="grid g3">${ms.map(plateCard).join("")}</div>` : `<div class="empty"><b>${tl("Noch keine Anlagen", "No equipment yet")}</b>${tl("Füge Heizung, Tore, Brandmeldeanlage usw. hinzu.", "Add heating, doors, fire alarm etc.")}</div>`}</section>
+  <div class="grid g2">
+    <section class="panel"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2>${tl("Prüfungen", "Inspections")}</h2>${ms.length ? `<button class="btn sm" data-act="suggest-insp" data-prop="${id}">${tl("Pflichtprüfungen vorschlagen", "Suggest required checks")}</button>` : ""}</div>${is.length ? `<div class="list">${is.map(inspRow).join("")}</div>` : `<p class="muted">${tl("Noch keine Prüfungen.", "No inspections yet.")}</p>`}</section>
+    <section class="panel"><h2>${tl("Reparaturen", "Repairs")}</h2>${ts.length ? `<div class="list">${ts.map(ticketRow).join("")}</div>` : `<p class="muted">${tl("Noch keine Reparaturen.", "No repairs yet.")}</p>`}</section>
+  </div>
+  ${p.notes ? `<section class="panel" style="margin-top:14px"><h2>${tl("Notizen", "Notes")}</h2><p class="prose" style="white-space:pre-wrap;margin:0">${esc(p.notes)}</p></section>` : ""}`;
+}
+function plateCard(m) {
+  const c = catOf(m);
+  return `<a class="plate" href="#m-${m.id}">
+    <div class="p-top"><span class="p-code">${esc(c?.code || "ANL")}</span><span class="tag">${esc(m.location || "")}</span></div>
+    <div class="p-name">${esc(machineName(m))}${example(m)}</div>
+    <dl><dt>${tl("Hersteller", "Make")}</dt><dd>${esc(m.brand || "–")}</dd><dt>${tl("Modell", "Model")}</dt><dd>${esc(m.model || "–")}</dd><dt>${tl("Baujahr", "Year")}</dt><dd>${esc(m.year || "–")}</dd></dl></a>`;
+}
+
+/* ---------- Anlage ---------- */
+function viewMachine(id) {
+  const m = S.machines[id];
+  if (!m) return `<div class="empty"><b>${tl("Anlage nicht gefunden", "Equipment not found")}</b><a href="#objects">${tl("Zu den Objekten", "Back to properties")}</a></div>`;
+  const c = catOf(m);
+  const ts = vals("tickets").filter(t => t.machineId === id).sort((a, b) => (b.created || "").localeCompare(a.created || ""));
+  const total = ts.reduce((s, t) => s + (Number(t.cost) || 0), 0);
+  const is = vals("inspections").filter(i => i.machineId === id);
+  const contr = contractorsFor(c?.trade, m);
+  const info = m.aiInfo;
+  const age = m.year ? new Date().getFullYear() - Number(m.year) : null;
+  return `<div class="head"><div><div class="eyebrow"><a href="#p-${m.propertyId}">${esc(propName(m.propertyId))}</a> / ${esc(c?.code || "")}</div><h1>${esc(machineName(m))}${example(m)}</h1><div class="muted">${esc(m.location || "")}</div></div>
+    <div class="row"><button class="btn" data-act="edit-machine" data-id="${id}">${tl("Bearbeiten", "Edit")}</button><a class="btn primary" href="#call" data-act="call-from-machine" data-id="${id}">${tl("Störung melden", "Report fault")}</a></div></div>
+  <div class="grid g2" style="margin-bottom:14px">
+    <div class="plate" style="padding-bottom:18px">
+      <div class="p-top"><span class="p-code">${esc(c?.code || "ANL")} · ${esc(tr(c?.name) || "")}</span><span class="tag">ID ${esc(id)}</span></div>
+      <dl style="font-size:14px">
+        <dt>${tl("Hersteller", "Make")}</dt><dd>${esc(m.brand || "–")}</dd>
+        <dt>${tl("Modell / Typ", "Model / type")}</dt><dd>${esc(m.model || "–")}</dd>
+        <dt>${tl("Serien-Nr.", "Serial no.")}</dt><dd>${esc(m.serial || "–")}</dd>
+        <dt>${tl("Baujahr", "Year")}</dt><dd>${esc(m.year || "–")}${age != null && !isNaN(age) ? ` · ${age} ${tl("Jahre", "years")}` : ""}</dd>
+        <dt>${tl("Leistung", "Rating")}</dt><dd>${esc(m.power || "–")}</dd>
+        <dt>${tl("Letzte Wartung", "Last service")}</dt><dd>${fmtDate(m.lastService)}</dd>
+      </dl>
+      ${sample && imgOK ? `<div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px"><label class="btn sm primary" style="cursor:pointer">${m._busy ? `<span class="spin"></span> ${tl("Liest Typenschild…", "Reading plate…")}` : tl("Typenschild-Foto hochladen", "Upload type plate photo")}<input type="file" accept="image/*" data-plate="${id}" hidden></label>
+        <p class="muted" style="font-size:12px;margin:6px 0 0">${tl("Die KI liest Hersteller, Modell und Baujahr und erklärt das Gerät.", "AI reads make, model and year, and explains the unit.")}</p></div>` : ""}
+    </div>
+    <div class="grid" style="gap:14px">
+      ${m.photoId ? `<img class="thumb" src="${blob(m.photoId)}" alt="">` : assets ? `<label class="ph" style="cursor:pointer">${tl("+ Foto der Anlage hinzufügen", "+ Add a photo of the unit")}<input type="file" accept="image/*" data-photo-m="${id}" hidden></label>` : ""}
+      <div class="row">${m.plateId ? `<a class="btn sm" href="${blob(m.plateId)}" target="_blank" rel="noopener">${tl("Typenschild-Foto ansehen", "View plate photo")}</a>` : ""}${m.photoId && assets ? `<label class="btn sm" style="cursor:pointer">${tl("Foto ersetzen", "Replace photo")}<input type="file" accept="image/*" data-photo-m="${id}" hidden></label>` : ""}</div>
+    </div>
+  </div>
+  <div class="grid g2">
+    <section class="panel"><h2>${tl("Was ist das?", "What is this?")}</h2><p class="prose" style="margin:0">${esc(tr(c?.what) || "")}</p>
+      ${info ? `<div class="ai" style="margin-top:12px"><div class="eyebrow">${tl("KI zu diesem Modell", "AI on this model")} · ${esc((info.lang || "").toUpperCase())}</div><p style="margin:6px 0">${esc(info.summary || "")}</p>
+        ${info.commonFaults?.length ? `<p class="eyebrow" style="margin-top:10px">${tl("Typische Fehler", "Common faults")}</p>${info.commonFaults.map(f => `<div class="cause" style="grid-template-columns:1fr"><div><b>${esc(f.title)}</b><div class="muted" style="font-size:14px">${esc(f.explanation)}</div></div></div>`).join("")}` : ""}
+        ${info.maintenance ? `<p style="margin:8px 0 0"><b>${tl("Wartung", "Maintenance")}:</b> ${esc(info.maintenance)}</p>` : ""}
+        ${info.warning ? `<p style="margin:8px 0 0"><b>${tl("Achtung", "Caution")}:</b> ${esc(info.warning)}</p>` : ""}</div>` : ""}
+      ${sample && (m.brand || m.model) ? `<button class="btn sm" style="margin-top:12px" data-act="machine-ai" data-id="${id}" ${m._busy ? "disabled" : ""}>${m._busy ? `<span class="spin"></span>` : ""} ${info ? tl("KI-Infos aktualisieren", "Refresh AI info") : tl("KI-Infos zu diesem Modell", "AI info for this model")}</button>` : ""}
+      ${c ? `<details style="margin-top:14px"><summary>${tl("Typische Störungen dieses Anlagentyps", "Typical faults for this type")}</summary><ul style="margin:8px 0 0">${c.sym.map(s => `<li>${sevPill(s.sev)} ${esc(tr(s.l))}</li>`).join("")}</ul></details>` : ""}</section>
+    <section class="panel"><h2>${tl("Zuständig für Reparatur", "Who repairs it")}</h2><div class="callwho">${contr.length ? contr.slice(0, 3).map(contactCard).join("") : `<p class="muted">${tl("Noch kein Dienstleister hinterlegt.", "No contractor saved yet.")}</p>`}</div>
+      ${m.contract ? `<p style="font-size:14px;margin:10px 0 0"><b>${tl("Wartungsvertrag", "Service contract")}:</b> ${esc(m.contract)}</p>` : ""}
+      ${m.warrantyUntil ? `<p style="font-size:14px;margin:6px 0 0"><b>${tl("Gewährleistung bis", "Warranty until")}:</b> ${fmtDate(m.warrantyUntil)} ${daysUntil(m.warrantyUntil) >= 0 ? `<span class="sev green">${tl("aktiv", "active")}</span>` : ""}</p>` : ""}</section>
+    <section class="panel"><h2>${tl("Reparatur-Historie", "Repair history")}</h2>
+      ${ts.length ? `<div class="list">${ts.map(ticketRow).join("")}</div><p style="margin:10px 0 0"><b>${tl("Summe", "Total")}:</b> <span class="mono">${money(total)}</span></p>${ts.length >= 3 ? `<div class="check warn" style="margin-top:10px">${tl(`${ts.length} Reparaturen an dieser Anlage. Prüfen, ob ein Austausch günstiger ist.`, `${ts.length} repairs on this unit. Check whether replacing it is cheaper.`)}</div>` : ""}` : `<p class="muted">${tl("Noch keine Reparaturen.", "No repairs yet.")}</p>`}</section>
+    <section class="panel"><h2>${tl("Prüfungen", "Inspections")}</h2>${is.length ? `<div class="list">${is.map(inspRow).join("")}</div>` : `<p class="muted">${tl("Keine Prüfung eingetragen.", "No inspection set.")}</p>`}
+      ${c?.insp?.length ? `<p class="muted" style="font-size:13px;margin:10px 0 0">${tl("Üblich", "Typical")}: ${c.insp.map(x => esc(tr(x.l))).join(" · ")}</p>` : ""}</section>
+    <section class="panel"><h2>${tl("Dokumente", "Documents")}</h2>
+      ${(m.docs || []).length ? `<div class="list">${m.docs.map(d => `<a class="item" href="${blob(d.id)}" target="_blank" rel="noopener"><span class="bar"></span><span class="ttl">${esc(d.name)}</span><span class="tag">${esc((d.name.split(".").pop() || "").toUpperCase())}</span></a>`).join("")}</div>` : `<p class="muted">${tl("Bedienungsanleitung, Wartungsvertrag, Prüfbericht …", "Manual, service contract, inspection report …")}</p>`}
+      ${assets ? `<label class="btn sm" style="cursor:pointer;margin-top:10px">${tl("Dokument hochladen", "Upload document")}<input type="file" accept="application/pdf,image/*" data-doc="${id}" hidden></label>` : ""}</section>
+    <section class="panel"><h2>${tl("QR-Etikett", "QR sticker")}</h2>
+      <div class="row" style="align-items:flex-start;gap:16px"><div class="qr" id="qr"></div><div style="flex:1;min-width:180px;font-size:14px"><p style="margin:0 0 8px">${tl("Auf die Anlage kleben. Beim Scannen öffnet sich diese Seite mit allen Daten.", "Stick it on the unit. Scanning opens this page with all its details.")}</p><p class="muted" style="font-size:12px;margin:0 0 10px">${tl("Nur für Personen mit Zugriff auf die App. Ein Meldeformular für Mieter kann später ergänzt werden.", "Only for people with access to the app. A reporting form for tenants can be added later.")}</p>${downloads ? `<button class="btn sm" data-act="qr-save" data-id="${id}">${tl("Als Bild speichern", "Save as image")}</button>` : ""}</div></div></section>
+  </div>
+  ${m.notes ? `<section class="panel" style="margin-top:14px"><h2>${tl("Notizen", "Notes")}</h2><p style="white-space:pre-wrap;margin:0">${esc(m.notes)}</p></section>` : ""}`;
+}
+
+/* ---------- Reparaturen ---------- */
+function viewTickets() {
+  const all = vals("tickets").sort((a, b) => (b.created || "").localeCompare(a.created || ""));
+  const list = ticketFilter === "all" ? all : ticketFilter === "done" ? all.filter(t => t.status === "done") : all.filter(t => t.status !== "done");
+  return `<div class="head"><div><div class="eyebrow">${all.length} ${tl("Tickets", "tickets")}</div><h1>${tl("Reparaturen", "Repairs")}</h1></div><a class="btn primary" href="#call">${tl("Störung aufnehmen", "Log a fault")}</a></div>
+  <div class="tabs">${[["open", tl("Offen", "Open")], ["done", tl("Erledigt", "Done")], ["all", tl("Alle", "All")]].map(([k, l]) => `<button class="${ticketFilter === k ? "on" : ""}" data-tfilter="${k}">${l}</button>`).join("")}</div>
+  ${list.length ? `<div class="panel"><div class="list">${list.map(ticketRow).join("")}</div></div>` : `<div class="empty"><b>${tl("Keine Tickets", "No tickets")}</b>${tl("Neue Störungen legst du über „Störung aufnehmen“ an.", "Create new ones via „Log a fault“.")}</div>`}`;
+}
+
+function ticketModal(id) {
+  const t = S.tickets[id]; if (!t) return;
+  const m = S.machines[t.machineId];
+  const c = CATALOG[t.cat] || catOf(m);
+  const lim = Number(S.settings.limit) || 0;
+  const qA = Number(t.quoteA) || 0, qB = Number(t.quoteB) || 0;
+  const hist = vals("tickets").filter(x => x.id !== id && x.cat === t.cat && Number(x.cost) > 0);
+  const avg = hist.length ? hist.reduce((s, x) => s + Number(x.cost), 0) / hist.length : 0;
+  let check = "";
+  const maxQ = Math.max(qA, qB);
+  if (qA && !qB && qA > lim) check = `<div class="check warn"><b>${tl("Über deiner Freigabegrenze", "Above your approval limit")} (${money(lim)}).</b> ${tl("Hol ein zweites Angebot ein, bevor du beauftragst.", "Get a second quote before you approve.")}</div>`;
+  else if (qA && qB) { const lo = Math.min(qA, qB), hi = Math.max(qA, qB); check = `<div class="check ${hi - lo > lo * 0.15 ? "warn" : "ok"}">${tl("Günstiger", "Cheaper")}: <b>${esc(qA <= qB ? (t.quoteAFrom || "A") : (t.quoteBFrom || "B"))}</b> ${tl("mit", "at")} <b class="mono">${money(lo)}</b>. ${tl("Unterschied", "Difference")}: <span class="mono">${money(hi - lo)}</span> (${Math.round((hi - lo) / lo * 100)} %).</div>`; }
+  else if (qA) check = `<div class="check ok">${tl("Innerhalb deiner Freigabegrenze.", "Within your approval limit.")}</div>`;
+  if (avg && maxQ) check += `<div class="check ${maxQ > avg * 1.3 ? "bad" : "ok"}" style="margin-top:8px">${tl("Bisher bezahlt für ähnliche Reparaturen", "Paid before for similar repairs")}: <b class="mono">${money(avg)}</b> ${tl("im Schnitt", "on average")} (${hist.length}×).${maxQ > avg * 1.3 ? " " + tl("Dieses Angebot liegt deutlich darüber.", "This quote is clearly higher.") : ""}</div>`;
+  const neg = t.negotiation;
+  const contrOpts = vals("contractors").map(x => `<option value="${x.id}" ${t.contractorId === x.id ? "selected" : ""}>${esc(x.name)} · ${esc(tr(TRADES[x.trade]))}</option>`).join("");
+  openModal(`<div class="mhead"><div><div class="eyebrow">${esc(propName(t.propertyId))}${m ? " · " + esc(machineName(m)) : ""}</div><h2>${esc(t.title)}</h2></div><button class="btn ghost sm" data-close>${tl("Schließen", "Close")}</button></div>
+  <div class="row" style="margin-bottom:12px">${sevPill(t.severity)} <span class="muted" style="font-size:13px">${tl("Angelegt", "Created")} ${fmtDate(t.created)}</span></div>
+  ${t.notes ? `<p style="white-space:pre-wrap;margin:0 0 12px" class="prose">${esc(t.notes)}</p>` : ""}
+  ${t.ai?.summary ? `<div class="ai" style="margin-bottom:12px;font-size:14px"><div class="eyebrow">${tl("KI-Einschätzung", "AI assessment")}</div>${esc(t.ai.summary)}</div>` : ""}
+  <form id="tform" class="form">
+    <label class="field"><span>Status</span><select id="t-status">${Object.entries(STATUS).map(([k, v]) => `<option value="${k}" ${t.status === k ? "selected" : ""}>${esc(tr(v))}</option>`).join("")}</select></label>
+    <label class="field"><span>${tl("Einstufung", "Severity")}</span><select id="t-sev">${Object.keys(SEV).map(k => `<option value="${k}" ${t.severity === k ? "selected" : ""}>${esc(tr(SEV[k].label))}</option>`).join("")}</select></label>
+    <label class="field wide"><span>${tl("Beauftragter Dienstleister", "Assigned contractor")}</span><select id="t-contr"><option value="">–</option>${contrOpts}</select></label>
+    <label class="field"><span>${tl("Angebot 1 (€)", "Quote 1 (€)")}</span><input type="number" id="t-qa" min="0" value="${esc(t.quoteA || "")}"></label>
+    <label class="field"><span>${tl("von", "from")}</span><input type="text" id="t-qaf" value="${esc(t.quoteAFrom || "")}"></label>
+    <label class="field"><span>${tl("Angebot 2 (€)", "Quote 2 (€)")}</span><input type="number" id="t-qb" min="0" value="${esc(t.quoteB || "")}"></label>
+    <label class="field"><span>${tl("von", "from")}</span><input type="text" id="t-qbf" value="${esc(t.quoteBFrom || "")}"></label>
+    <div class="wide">${check}</div>
+    <label class="field"><span>${tl("Endgültige Kosten (€)", "Final cost (€)")}</span><input type="number" id="t-cost" min="0" value="${esc(t.cost || "")}"></label>
+    <label class="field wide"><span>${tl("Notizen", "Notes")}</span><textarea id="t-notes">${esc(t.notes || "")}</textarea></label>
+  </form>
+  ${sample && (qA || qB) ? `<div class="ai" style="margin-top:14px"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">${tl("Verhandlungshilfe", "Negotiation helper")}</div><h3>${tl("Argumente + E-Mail an den Dienstleister", "Arguments + email to the contractor")}</h3></div><button class="btn sm primary" data-act="negotiate" data-id="${id}" ${t._busy ? "disabled" : ""}>${t._busy ? `<span class="spin"></span>` : tl("Erstellen", "Create")}</button></div>
+    ${neg ? `<ul style="margin:10px 0">${(neg.arguments || []).map(a => `<li>${esc(a)}</li>`).join("")}</ul><p class="eyebrow">${tl("E-Mail (Deutsch)", "Email (German)")}</p><div class="panel" style="white-space:pre-wrap;font-size:14px" id="neg-mail"><b>${esc(neg.subject || "")}</b>\n\n${esc(neg.body || "")}</div><button class="btn sm" style="margin-top:8px" data-copy-el="neg-mail">${tl("E-Mail kopieren", "Copy email")}</button>${neg.bodyEn ? `<details style="margin-top:8px"><summary class="muted">${tl("Übersetzung", "Translation")}</summary><p style="white-space:pre-wrap;font-size:14px">${esc(neg.bodyEn)}</p></details>` : ""}` : ""}</div>` : ""}
+  <div class="row" style="justify-content:space-between;margin-top:16px"><button class="btn danger sm" data-act="del-ticket" data-id="${id}">${tl("Ticket löschen", "Delete ticket")}</button><button class="btn primary" data-act="save-ticket" data-id="${id}">${tl("Speichern", "Save")}</button></div>`);
+}
+
+/* ---------- Prüfungen ---------- */
+function viewInspections() {
+  const is = vals("inspections").sort((a, b) => (a.next || "9").localeCompare(b.next || "9"));
+  return `<div class="head"><div><div class="eyebrow">${tl("Prüfpflichten & Wartung", "Required checks & service")}</div><h1>${tl("Prüfungen", "Inspections")}</h1></div><button class="btn primary" data-act="new-insp">${tl("Prüfung eintragen", "Add inspection")}</button></div>
+  ${is.length ? `<div class="panel tscroll"><table><thead><tr><th>${tl("Prüfung", "Inspection")}</th><th>${tl("Objekt / Anlage", "Property / unit")}</th><th>${tl("Intervall", "Interval")}</th><th>${tl("Zuletzt", "Last")}</th><th>${tl("Fällig", "Due")}</th><th></th></tr></thead><tbody>${is.map(i => {
+    const d = i.next ? daysUntil(i.next) : null; const m = S.machines[i.machineId];
+    return `<tr><td><b>${esc(inspTitle(i))}</b>${example(i)}</td><td>${esc(propName(i.propertyId))}${m ? `<br><span class="muted">${esc(machineName(m))}</span>` : ""}</td><td class="mono">${esc(i.months)} ${tl("Mon.", "mo")}</td><td class="mono">${fmtDate(i.last)}</td><td class="mono ${d != null && d < 0 ? "due-over" : d != null && d <= 30 ? "due-soon" : ""}">${fmtDate(i.next)}${d != null ? `<br><span style="font-size:11px">${d < 0 ? tl(`${-d} Tage überfällig`, `${-d} days overdue`) : tl(`in ${d} Tagen`, `in ${d} days`)}</span>` : ""}</td><td><div class="row" style="flex-wrap:nowrap"><button class="btn sm" data-act="insp-done" data-id="${i.id}">${tl("Erledigt", "Done")}</button><button class="btn sm ghost" data-insp="${i.id}">${tl("Bearbeiten", "Edit")}</button></div></td></tr>`; }).join("")}</tbody></table></div>`
+    : `<div class="empty"><b>${tl("Noch keine Prüfungen", "No inspections yet")}</b>${tl("Öffne ein Objekt und tippe auf „Pflichtprüfungen vorschlagen“.", "Open a property and tap „Suggest required checks“.")}</div>`}
+  <p class="muted" style="font-size:12px;margin-top:12px">${tl("Intervalle sind typische Werte. Maßgeblich sind Gesetz, Prüfbuch, Herstellerangaben und dein Versicherer.", "Intervals are typical values. What counts is the law, the inspection log, the manufacturer and your insurer.")}</p>`;
+}
+
+/* ---------- Dienstleister ---------- */
+function viewContractors() {
+  const cs = vals("contractors").sort((a, b) => (a.trade || "").localeCompare(b.trade || ""));
+  return `<div class="head"><div><div class="eyebrow">${cs.length} ${tl("Kontakte", "contacts")}</div><h1>${tl("Dienstleister", "Contractors")}</h1></div><button class="btn primary" data-act="new-contr">${tl("Dienstleister anlegen", "Add contractor")}</button></div>
+  ${cs.length ? `<div class="grid g2">${cs.map(c => {
+    const spent = vals("tickets").filter(t => t.contractorId === c.id).reduce((s, t) => s + (Number(t.cost) || 0), 0);
+    return `<section class="panel"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">${esc(tr(TRADES[c.trade]))}</div><h2>${esc(c.name)}${example(c)}</h2></div><button class="btn sm ghost" data-act="edit-contr" data-id="${c.id}">${tl("Bearbeiten", "Edit")}</button></div>
+    <div class="row" style="margin-top:10px"><span class="phone">${esc(c.phone || "–")}</span>${c.phone ? `<button class="btn sm" data-copy="${esc(c.phone)}">${tl("Kopieren", "Copy")}</button>` : ""}${c.emergency ? `<span class="tag">24/7 ${tl("Notdienst", "emergency")}</span>` : ""}</div>
+    ${c.email ? `<div class="mono" style="font-size:13px;margin-top:4px;user-select:all">${esc(c.email)}</div>` : ""}
+    ${c.rates ? `<p style="font-size:14px;margin:8px 0 0"><b>${tl("Konditionen", "Rates")}:</b> ${esc(c.rates)}</p>` : ""}
+    ${c.notes ? `<p class="muted" style="font-size:14px;margin:6px 0 0">${esc(c.notes)}</p>` : ""}
+    <p class="muted" style="font-size:12px;margin:8px 0 0">${tl("Bisher bezahlt", "Paid so far")}: <span class="mono">${money(spent)}</span></p></section>`; }).join("")}</div>`
+  : `<div class="empty"><b>${tl("Noch keine Dienstleister", "No contractors yet")}</b>${tl("Lege Heizungsfirma, Elektriker, Torfirma usw. an.", "Add your heating firm, electrician, door firm etc.")}</div>`}`;
+}
+
+/* ---------- Anlagen-Wissen ---------- */
+function viewCatalog() {
+  const c = CATALOG[catOpen];
+  return `<div class="head"><div><div class="eyebrow">${Object.keys(CATALOG).length} ${tl("Anlagentypen", "equipment types")}</div><h1>${tl("Anlagen-Wissen", "Equipment guide")}</h1><p class="muted prose" style="margin:6px 0 0">${tl("Was jede Anlage macht, was typischerweise kaputt geht und wie dringend es ist.", "What each system does, what typically goes wrong and how urgent it is.")}</p></div></div>
+  <div class="grid g3" style="margin-bottom:18px">${Object.entries(CATALOG).map(([k, x]) => `<button class="plate cat-card" style="text-align:left;cursor:pointer;${catOpen === k ? "border-color:var(--accent)" : ""}" data-cat="${k}"><div class="p-top"><span class="p-code">${x.code}</span><span class="tag">${esc(tr(TRADES[x.trade]))}</span></div><div class="p-name">${esc(tr(x.name))}</div><div class="muted" style="font-size:13px;margin-top:4px">${x.sym.length} ${tl("Störungsbilder", "fault types")}</div></button>`).join("")}</div>
+  ${c ? `<section class="panel" id="cat-detail"><div class="eyebrow">${c.code}</div><h2>${esc(tr(c.name))}</h2><p class="prose" style="margin:8px 0 14px">${esc(tr(c.what))}</p>
+    ${c.insp.length ? `<p style="margin:0 0 14px"><b>${tl("Prüfpflicht / Wartung", "Required checks / service")}:</b> ${c.insp.map(x => esc(tr(x.l))).join(" · ")}</p>` : ""}
+    ${c.sym.map(s => `<details style="border-top:1px solid var(--line);padding:10px 0"><summary>${sevPill(s.sev)} ${esc(tr(s.l))}</summary><p style="margin:8px 0">${esc(tr(s.act))}</p>${[...s.c].sort((a, b) => b.p - a.p).map(x => `<div class="cause"><div>${meter(x.p)}</div><div><b>${esc(tr(x.t))}</b> <span class="cost">${costSigns(x.k)}</span><div class="muted" style="font-size:14px">${esc(tr(x.w))}</div></div></div>`).join("")}</details>`).join("")}</section>` : `<p class="muted">${tl("Wähle einen Anlagentyp.", "Pick an equipment type.")}</p>`}`;
+}
+
+/* ---------- Wörterbuch ---------- */
+function viewGlossary() {
+  const q = glossQ.trim().toLowerCase();
+  const rows = GLOSSARY.filter(g => !q || g.join(" ").toLowerCase().includes(q));
+  return `<div class="head"><div><div class="eyebrow">${GLOSSARY.length} ${tl("Begriffe", "terms")}</div><h1>${tl("Wörterbuch Haustechnik", "Building services glossary")}</h1></div></div>
+  <input type="search" id="gloss-q" placeholder="${tl("Suchen, z. B. Druck, Tor, FI …", "Search, e.g. pressure, door, RCD …")}" value="${esc(glossQ)}" style="max-width:420px;margin-bottom:12px">
+  <div class="panel" id="gloss-list">${glossRows(rows)}</div>`;
+}
+function glossRows(rows) {
+  return rows.length ? rows.map(g => `<div class="gl-row"><b>${esc(g[0])}</b><span class="muted">${esc(g[1])}</span><span class="gl-x">${esc(lang === "en" ? g[3] : g[2])}</span></div>`).join("") : `<p class="muted">${tl("Nichts gefunden.", "Nothing found.")}</p>`;
+}
+
+/* ---------- Modal + Formulare ---------- */
+function openModal(html) { $("#modal-root").innerHTML = `<div class="overlay" data-overlay><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`; const f = $("#modal-root input, #modal-root select, #modal-root textarea"); if (f) f.focus(); }
+function closeModal() { $("#modal-root").innerHTML = ""; }
+function formModal(title, fields, data, onSave, extra = "") {
+  openModal(`<div class="mhead"><h2>${esc(title)}</h2><button class="btn ghost sm" data-close>${tl("Schließen", "Close")}</button></div>
+  <form id="fm" class="form">${fields.map(f => {
+    const v = data[f.k] ?? f.def ?? "";
+    const id = "f-" + f.k;
+    let input;
+    if (f.type === "select") input = `<select id="${id}">${f.opts.map(([ov, ol]) => `<option value="${esc(ov)}" ${String(v) === String(ov) ? "selected" : ""}>${esc(ol)}</option>`).join("")}</select>`;
+    else if (f.type === "textarea") input = `<textarea id="${id}">${esc(v)}</textarea>`;
+    else if (f.type === "check") input = `<label class="row" style="gap:8px"><input type="checkbox" id="${id}" ${v ? "checked" : ""}> ${esc(f.hint || "")}</label>`;
+    else if (f.type === "file") input = `<input type="file" id="${id}" accept="image/*">`;
+    else input = `<input type="${f.type || "text"}" id="${id}" value="${esc(v)}" ${f.ph ? `placeholder="${esc(f.ph)}"` : ""}>`;
+    return `<label class="field ${f.wide ? "wide" : ""}"><span>${esc(f.label)}</span>${input}</label>`; }).join("")}</form>
+  ${extra}
+  <div class="row" style="justify-content:space-between;margin-top:16px"><span>${data.__del || ""}</span><button class="btn primary" id="fm-save">${tl("Speichern", "Save")}</button></div>`);
+  $("#fm-save").onclick = async () => {
+    const out = {}; let file = null;
+    fields.forEach(f => { const el = $("#f-" + f.k); if (!el) return; if (f.type === "check") out[f.k] = el.checked; else if (f.type === "file") file = el.files[0] || null; else out[f.k] = el.value.trim(); });
+    if (fields.some(f => f.req && !out[f.k])) { toast(tl("Bitte Pflichtfelder ausfüllen", "Please fill in the required fields")); return; }
+    $("#fm-save").disabled = true;
+    await onSave(out, file); closeModal();
+  };
+  $("#fm").onsubmit = e => e.preventDefault();
+}
+async function uploadImage(file) {
+  if (!file || !assets) return null;
+  try { const r = await assets.upload(file); return r.id; } catch (e) { toast(tl("Upload fehlgeschlagen: ", "Upload failed: ") + (e.message || e.code)); return null; }
+}
+const propOpts = () => vals("properties").map(p => [p.id, p.name]);
+const tradeOpts = () => Object.entries(TRADES).map(([k, v]) => [k, tr(v)]);
+
+function propForm(id) {
+  const p = id ? S.properties[id] : {};
+  const fields = [
+    { k: "name", label: tl("Name *", "Name *"), req: true, ph: tl("z. B. Logistikhalle Reisholz", "e.g. Reisholz warehouse") },
+    { k: "type", label: tl("Art", "Type"), type: "select", opts: [["Halle", tl("Lager-/Logistikhalle", "Warehouse")], ["Büro", tl("Bürogebäude", "Office")], ["Gewerbe", tl("Gewerbe gemischt", "Mixed commercial")], ["Wohnen", tl("Wohnen", "Residential")]] },
+    { k: "address", label: tl("Adresse", "Address"), wide: true },
+    { k: "tenant", label: tl("Mieter (Firma)", "Tenant (company)") },
+    { k: "tenantContact", label: tl("Ansprechpartner beim Mieter", "Tenant contact") },
+    { k: "rent", label: tl("Miete / Monat (€)", "Rent / month (€)"), type: "number" },
+    { k: "area", label: tl("Fläche (m²)", "Area (m²)"), type: "number" },
+    { k: "leaseEnd", label: tl("Mietvertrag bis", "Lease until"), type: "date" },
+    ...(assets ? [{ k: "photo", label: tl("Foto", "Photo"), type: "file" }] : []),
+    { k: "notes", label: tl("Notizen", "Notes"), type: "textarea", wide: true }
+  ];
+  formModal(id ? tl("Objekt bearbeiten", "Edit property") : tl("Neues Objekt", "New property"), fields, { ...p, __del: id ? `<button class="btn danger sm" data-act="del-prop" data-id="${id}">${tl("Objekt löschen", "Delete property")}</button>` : "" }, async (o, file) => {
+    const nid = id || uid(); const photoId = file ? await uploadImage(file) : null;
+    delete o.photo;
+    await save("properties", nid, { ...(S.properties[nid] || {}), ...o, rent: Number(o.rent) || 0, ...(photoId ? { photoId } : {}) });
+    if (!id) location.hash = "p-" + nid;
+  });
+}
+function machineForm(id, propId) {
+  const m = id ? S.machines[id] : { propertyId: propId };
+  const fields = [
+    { k: "cat", label: tl("Anlagentyp *", "Equipment type *"), type: "select", req: true, opts: Object.entries(CATALOG).map(([k, c]) => [k, c.code + " · " + tr(c.name)]) },
+    { k: "name", label: tl("Eigene Bezeichnung", "Your label"), ph: tl("z. B. Heizung Halle A", "e.g. Heating hall A") },
+    { k: "propertyId", label: tl("Objekt", "Property"), type: "select", opts: propOpts() },
+    { k: "location", label: tl("Standort im Objekt", "Location in building"), ph: tl("z. B. Heizraum UG", "e.g. boiler room basement") },
+    { k: "brand", label: tl("Hersteller", "Make"), ph: "Viessmann, Hörmann …" },
+    { k: "model", label: tl("Modell / Typ", "Model / type") },
+    { k: "serial", label: tl("Serien-Nr.", "Serial no.") },
+    { k: "year", label: tl("Baujahr", "Year"), type: "number" },
+    { k: "power", label: tl("Leistung", "Rating"), ph: "z. B. 120 kW" },
+    { k: "lastService", label: tl("Letzte Wartung", "Last service"), type: "date" },
+    { k: "contractorId", label: tl("Zuständiger Dienstleister", "Assigned contractor"), type: "select", opts: [["", "–"], ...vals("contractors").map(c => [c.id, c.name + " · " + tr(TRADES[c.trade])])] },
+    { k: "warrantyUntil", label: tl("Gewährleistung bis", "Warranty until"), type: "date" },
+    { k: "contract", label: tl("Wartungsvertrag", "Service contract"), wide: true, ph: tl("z. B. Vollwartung, 1× jährlich, 450 € netto", "e.g. full service, yearly, €450 net") },
+    { k: "notes", label: tl("Notizen", "Notes"), type: "textarea", wide: true }
+  ];
+  formModal(id ? tl("Anlage bearbeiten", "Edit equipment") : tl("Neue Anlage", "New equipment"), fields, { ...m, __del: id ? `<button class="btn danger sm" data-act="del-machine" data-id="${id}">${tl("Anlage löschen", "Delete equipment")}</button>` : "" }, async o => {
+    const nid = id || uid();
+    await save("machines", nid, { ...(S.machines[nid] || {}), ...o });
+    if (!id) location.hash = "m-" + nid;
+  }, !id && sample && imgOK ? `<p class="muted" style="font-size:13px;margin:12px 0 0">${tl("Tipp: Nach dem Speichern kannst du ein Foto vom Typenschild hochladen. Die KI füllt Hersteller, Modell und Baujahr dann selbst aus.", "Tip: after saving you can upload a type plate photo. The AI then fills in make, model and year.")}</p>` : "");
+}
+function contrForm(id, trade) {
+  const c = id ? S.contractors[id] : { trade: trade || "heating" };
+  formModal(id ? tl("Dienstleister bearbeiten", "Edit contractor") : tl("Neuer Dienstleister", "New contractor"), [
+    { k: "name", label: tl("Firma *", "Company *"), req: true },
+    { k: "trade", label: tl("Gewerk", "Trade"), type: "select", opts: tradeOpts() },
+    { k: "phone", label: tl("Telefon", "Phone"), type: "tel" },
+    { k: "email", label: "E-Mail", type: "email" },
+    { k: "emergency", label: tl("Notdienst", "Emergency service"), type: "check", hint: tl("24/7 erreichbar", "Available 24/7") },
+    { k: "rates", label: tl("Konditionen", "Rates"), ph: tl("z. B. 78 €/Std., Anfahrt 45 €", "e.g. €78/h, call-out €45") },
+    { k: "notes", label: tl("Notizen", "Notes"), type: "textarea", wide: true }
+  ], { ...c, __del: id ? `<button class="btn danger sm" data-act="del-contr" data-id="${id}">${tl("Löschen", "Delete")}</button>` : "" }, async o => save("contractors", id || uid(), { ...(S.contractors[id] || {}), ...o }));
+}
+function inspForm(id) {
+  const i = id ? { ...S.inspections[id], title: inspTitle(S.inspections[id]) } : { months: 12 };
+  formModal(id ? tl("Prüfung bearbeiten", "Edit inspection") : tl("Neue Prüfung", "New inspection"), [
+    { k: "title", label: tl("Prüfung *", "Inspection *"), req: true, wide: true, ph: tl("z. B. UVV-Prüfung Rolltore", "e.g. annual door inspection") },
+    { k: "propertyId", label: tl("Objekt", "Property"), type: "select", opts: propOpts() },
+    { k: "machineId", label: tl("Anlage", "Equipment"), type: "select", opts: [["", "–"], ...vals("machines").map(m => [m.id, propName(m.propertyId) + " · " + machineName(m)])] },
+    { k: "months", label: tl("Intervall (Monate)", "Interval (months)"), type: "number" },
+    { k: "last", label: tl("Zuletzt geprüft", "Last done"), type: "date" },
+    { k: "next", label: tl("Nächster Termin (leer = automatisch)", "Next due (empty = automatic)"), type: "date" }
+  ], { ...i, __del: id ? `<button class="btn danger sm" data-act="del-insp" data-id="${id}">${tl("Löschen", "Delete")}</button>` : "" }, async o => {
+    const months = Number(o.months) || 12;
+    const next = o.next || (o.last ? addMonths(o.last, months) : today());
+    const prev = S.inspections[id] || {}; const keepL = prev.titleL && o.title === inspTitle(prev);
+    await save("inspections", id || uid(), { ...prev, ...o, months, next, titleL: keepL ? prev.titleL : null });
+  });
+}
+
+/* ---------- KI ---------- */
+function aiErr(e) {
+  if (e && e.code === "not_granted") toast(tl("KI wurde nicht erlaubt.", "AI access was not allowed."));
+  else if (e && e.code === "rate_limited") toast(tl("Zu viele Anfragen, bitte kurz warten.", "Too many requests, please wait a moment."));
+  else toast(tl("KI-Anfrage fehlgeschlagen.", "AI request failed."));
+}
+async function aiDiagnose() {
+  const p = S.properties[CALL.prop], m = S.machines[CALL.machine], c = CATALOG[CALL.cat], s = c?.sym.find(x => x.id === CALL.sym);
+  CALL.busy = true; render();
+  const L2 = lang === "en" ? "English" : "German";
+  const prompt = `You help a new, non-technical property manager in Germany who is on the phone with a commercial tenant reporting a building fault. Explain simply, no jargon (or explain jargon in brackets). Write all text values in ${L2}.
+Context:
+- Property: ${p ? `${p.name} (${p.type || ""}), tenant ${p.tenant || "?"}` : "unknown"}
+- Equipment: ${c ? c.name.en : "unknown"}${m ? `; make ${m.brand || "?"}, model ${m.model || "?"}, year ${m.year || "?"}, location ${m.location || "?"}` : ""}
+- Fault type chosen: ${s ? s.l.en : "none"}
+- Tenant's words / notes: ${CALL.text || "(none)"}
+Safety first: gas smell, water near electrics, burning smell, people trapped, fire alarm faults are emergencies.
+Reply with only JSON: {"severity":"red|amber|green","summary":"one or two sentences","firstSteps":["..."],"causes":[{"title":"...","explanation":"plain words, what it means and who fixes it","likelihood":1-3}],"questions":["questions still to ask the tenant"],"whoToCall":"which trade/company type to call and how urgently"}. Max 4 causes, 4 steps, 4 questions.`;
+  try {
+    const r = await sample.json(prompt, { modelTier: "default" });
+    if (r && typeof r === "object") { if (!SEV[r.severity]) r.severity = s?.sev || "amber"; CALL.ai = r; }
+  } catch (e) { aiErr(e); }
+  CALL.busy = false; render();
+}
+async function aiPlate(id, file) {
+  const m = S.machines[id]; if (!m || !file) return;
+  S.machines[id] = { ...m, _busy: true }; render();
+  const plateId = await uploadImage(file);
+  const L2 = lang === "en" ? "English" : "German";
+  const prompt = `This photo shows the type plate (Typenschild) or the unit itself of a piece of building equipment in a German commercial property. Read what you can. Then explain the unit for a non-technical property manager in ${L2}.
+Allowed category keys: ${Object.entries(CATALOG).map(([k, c]) => `${k} (${c.name.en})`).join(", ")}.
+Reply with only JSON: {"category":"one key or null","brand":"","model":"","serial":"","year":"4-digit or empty","power":"e.g. 24 kW or empty","summary":"2-3 plain sentences: what this unit is and does","commonFaults":[{"title":"","explanation":""}],"maintenance":"how often it needs service and by whom","warning":"safety note or empty"}. Leave fields empty when unreadable; never guess serial numbers.`;
+  try {
+    const r = await sample.json(prompt, { images: [file], modelTier: "default" });
+    const cur = { ...S.machines[id] }; delete cur._busy;
+    const pick = (k) => (r && r[k] && String(r[k]).trim()) || cur[k] || "";
+    await save("machines", id, { ...cur, brand: pick("brand"), model: pick("model"), serial: pick("serial"), year: pick("year"), power: pick("power"), cat: (r && CATALOG[r.category]) ? (cur.cat || r.category) : cur.cat, ...(plateId ? { plateId } : {}), aiInfo: { summary: r?.summary || "", commonFaults: Array.isArray(r?.commonFaults) ? r.commonFaults.slice(0, 5) : [], maintenance: r?.maintenance || "", warning: r?.warning || "", lang } });
+    toast(tl("Typenschild gelesen – bitte Angaben kurz prüfen.", "Plate read – please check the details."));
+  } catch (e) { const cur = { ...S.machines[id] }; delete cur._busy; if (plateId) cur.plateId = plateId; S.machines[id] = cur; if (plateId) save("machines", id, cur); else render(); aiErr(e); }
+}
+async function aiMachineInfo(id) {
+  const m = S.machines[id]; if (!m) return; const c = catOf(m);
+  S.machines[id] = { ...m, _busy: true }; render();
+  const L2 = lang === "en" ? "English" : "German";
+  const prompt = `Explain this building equipment for a non-technical property manager in Germany, in ${L2}, plain words: type ${c ? c.name.en : "unknown"}, make ${m.brand || "?"}, model ${m.model || "?"}, year ${m.year || "?"}. If you don't know this exact model, say so in the summary and describe the type in general.
+Reply with only JSON: {"summary":"2-3 sentences","commonFaults":[{"title":"","explanation":""}],"maintenance":"","warning":""}. Max 5 faults.`;
+  try {
+    const r = await sample.json(prompt, { modelTier: "default" });
+    const cur = { ...S.machines[id] }; delete cur._busy;
+    await save("machines", id, { ...cur, aiInfo: { summary: r?.summary || "", commonFaults: Array.isArray(r?.commonFaults) ? r.commonFaults.slice(0, 5) : [], maintenance: r?.maintenance || "", warning: r?.warning || "", lang } });
+  } catch (e) { const cur = { ...S.machines[id] }; delete cur._busy; S.machines[id] = cur; render(); aiErr(e); }
+}
+async function aiNegotiate(id) {
+  readTicketForm(id);
+  const t = S.tickets[id]; const m = S.machines[t.machineId]; const c = CATALOG[t.cat] || catOf(m);
+  const hist = vals("tickets").filter(x => x.id !== id && x.cat === t.cat && Number(x.cost) > 0).map(x => `${x.title}: ${x.cost} EUR`).slice(0, 6);
+  S.tickets[id] = { ...t, _busy: true }; ticketModal(id);
+  const prompt = `Help a property manager in Germany negotiate a repair quote with a contractor. Be firm but polite and fair; never insulting.
+Repair: ${t.title}. Equipment: ${c ? c.name.en : "?"} ${m ? `${m.brand || ""} ${m.model || ""} (year ${m.year || "?"})` : ""}. Notes: ${t.notes || "-"}.
+Quote 1: ${t.quoteA || "-"} EUR from ${t.quoteAFrom || "?"}. Quote 2: ${t.quoteB || "-"} EUR from ${t.quoteBFrom || "?"}. Internal approval limit: ${S.settings.limit} EUR. Past similar repairs: ${hist.join("; ") || "none"}.
+Reply with only JSON: {"arguments":["4-6 short negotiation points in ${lang === "en" ? "English" : "German"}"],"subject":"German email subject","body":"German email (Sie-Form) to the contractor of the higher or only quote: ask for an itemised breakdown (Material, Arbeitszeit, Anfahrt), mention the comparison quote or past prices if any, ask for a better price, sign as ‚Ihre Objektverwaltung‘","bodyEn":"${lang === "en" ? "English translation of the email" : ""}"}`;
+  try {
+    const r = await sample.json(prompt, { modelTier: "default" });
+    const cur = { ...S.tickets[id] }; delete cur._busy;
+    await save("tickets", id, { ...cur, negotiation: { arguments: Array.isArray(r?.arguments) ? r.arguments : [], subject: r?.subject || "", body: r?.body || "", bodyEn: r?.bodyEn || "" } });
+  } catch (e) { const cur = { ...S.tickets[id] }; delete cur._busy; S.tickets[id] = cur; aiErr(e); }
+  if ($("#modal-root").innerHTML) ticketModal(id);
+}
+function readTicketForm(id) {
+  const g = s => $(s)?.value ?? "";
+  if (!$("#tform")) return;
+  S.tickets[id] = { ...S.tickets[id], status: g("#t-status"), severity: g("#t-sev"), contractorId: g("#t-contr"), quoteA: Number(g("#t-qa")) || "", quoteAFrom: g("#t-qaf"), quoteB: Number(g("#t-qb")) || "", quoteBFrom: g("#t-qbf"), cost: Number(g("#t-cost")) || "", notes: g("#t-notes") };
+}
+
+/* ---------- Nach dem Rendern ---------- */
+function afterRender(r) {
+  if (r.startsWith("m-") && window.QRCode) {
+    const el = $("#qr");
+    if (el) { el.innerHTML = ""; try { new QRCode(el, { text: (APP_URL || "objekt-leitstand") + "#" + r, width: 300, height: 300, correctLevel: QRCode.CorrectLevel.M }); } catch (e) {} }
+  }
+  const lim = $("#limit-input"); if (lim) lim.onchange = () => saveSettings({ limit: Number(lim.value) || 0 });
+  const ct = $("#call-text"); if (ct) ct.oninput = () => CALL.text = ct.value;
+  const gq = $("#gloss-q"); if (gq) gq.oninput = () => { glossQ = gq.value; const q = glossQ.trim().toLowerCase(); $("#gloss-list").innerHTML = glossRows(GLOSSARY.filter(g => !q || g.join(" ").toLowerCase().includes(q))); };
+}
+
+/* ---------- Ereignisse ---------- */
+document.addEventListener("click", async e => {
+  const el = e.target.closest("[data-act],[data-call-prop],[data-call-machine],[data-call-cat],[data-call-sym],[data-ticket],[data-insp],[data-cat],[data-tfilter],[data-copy],[data-copy-el],[data-close],[data-overlay]");
+  if (!el) return;
+  if (el.hasAttribute("data-overlay") && e.target !== el) return;
+  if (el.hasAttribute("data-overlay") || el.hasAttribute("data-close")) { closeModal(); return; }
+  const d = el.dataset;
+  if (d.callProp != null) { if (CALL.prop !== d.callProp) Object.assign(CALL, { prop: d.callProp, machine: "", cat: "", sym: "", ai: null, checked: {} }); render(); return; }
+  if (d.callMachine != null) { const m = S.machines[d.callMachine]; Object.assign(CALL, { machine: d.callMachine, cat: m?.cat || "", sym: "", ai: null, checked: {} }); render(); return; }
+  if (d.callCat != null) { Object.assign(CALL, { machine: "", cat: d.callCat, sym: "", ai: null, checked: {} }); render(); return; }
+  if (d.callSym != null) { CALL.sym = d.callSym; CALL.checked = {}; render(); return; }
+  if (d.ticket != null) { ticketModal(d.ticket); return; }
+  if (d.insp != null) { inspForm(d.insp); return; }
+  if (d.cat != null) { catOpen = catOpen === d.cat ? "" : d.cat; render(); const x = $("#cat-detail"); if (x) x.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+  if (d.tfilter != null) { ticketFilter = d.tfilter; render(); return; }
+  if (d.copy != null || d.copyEl != null) {
+    const text = d.copy != null ? d.copy : ($("#" + d.copyEl)?.innerText || "");
+    try { await navigator.clipboard.writeText(text); toast(tl("Kopiert", "Copied")); }
+    catch (_) { const r = document.createRange(); const n = d.copyEl ? $("#" + d.copyEl) : el.previousElementSibling; if (n) { r.selectNodeContents(n); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } toast(tl("Markiert – mit Strg+C kopieren", "Selected – press Ctrl+C to copy")); }
+    return;
+  }
+  const id = d.id;
+  switch (d.act) {
+    case "new-prop": propForm(); break;
+    case "edit-prop": propForm(id); break;
+    case "new-machine": machineForm(null, d.prop); break;
+    case "edit-machine": machineForm(id); break;
+    case "new-contr": contrForm(null, d.trade); break;
+    case "edit-contr": contrForm(id); break;
+    case "new-insp": inspForm(); break;
+    case "del-prop": confirmDel(tl("Objekt mit allen Daten löschen?", "Delete this property and its data?"), async () => { for (const m of vals("machines").filter(m => m.propertyId === id)) await remove("machines", m.id); await remove("properties", id); location.hash = "objects"; }); break;
+    case "del-machine": { const pid = S.machines[id]?.propertyId; confirmDel(tl("Anlage löschen?", "Delete this equipment?"), async () => { await remove("machines", id); location.hash = "p-" + pid; }); break; }
+    case "del-contr": confirmDel(tl("Dienstleister löschen?", "Delete this contractor?"), () => remove("contractors", id)); break;
+    case "del-insp": confirmDel(tl("Prüfung löschen?", "Delete this inspection?"), () => remove("inspections", id)); break;
+    case "del-ticket": confirmDel(tl("Ticket löschen?", "Delete this ticket?"), () => remove("tickets", id)); break;
+    case "save-ticket": readTicketForm(id); { const t = { ...S.tickets[id] }; delete t._busy; await save("tickets", id, t); closeModal(); toast(tl("Gespeichert", "Saved")); } break;
+    case "negotiate": aiNegotiate(id); break;
+    case "insp-done": { const i = S.inspections[id]; await patch("inspections", id, { last: today(), next: addMonths(today(), i.months) }); toast(tl("Als erledigt markiert – nächster Termin berechnet", "Marked done – next date calculated")); break; }
+    case "suggest-insp": suggestInspections(d.prop); break;
+    case "call-reset": Object.assign(CALL, { prop: "", machine: "", cat: "", sym: "", text: "", ai: null, checked: {} }); render(); break;
+    case "call-ai": aiDiagnose(); break;
+    case "call-ticket": createTicketFromCall(); break;
+    case "call-from-machine": { const m = S.machines[id]; Object.assign(CALL, { prop: m.propertyId, machine: id, cat: m.cat, sym: "", text: "", ai: null, checked: {} }); break; }
+    case "machine-ai": aiMachineInfo(id); break;
+    case "qr-save": saveQR(id); break;
+  }
+});
+document.addEventListener("change", async e => {
+  const el = e.target;
+  if (el.matches("[data-q]")) { CALL.checked[el.dataset.q] = el.checked; return; }
+  if (el.matches("[data-plate]")) { aiPlate(el.dataset.plate, el.files[0]); return; }
+  if (el.matches("[data-photo-m]")) { const id = el.dataset.photoM; const pid = await uploadImage(el.files[0]); if (pid) patch("machines", id, { photoId: pid }); return; }
+  if (el.matches("[data-doc]")) { const id = el.dataset.doc; const f = el.files[0]; if (!f || !assets) return; try { const r = await assets.upload(f); const m = S.machines[id]; await patch("machines", id, { docs: [...(m.docs || []), { id: r.id, name: f.name }] }); toast(tl("Dokument gespeichert", "Document saved")); } catch (err) { toast(tl("Upload fehlgeschlagen", "Upload failed")); } }
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && $("#modal-root").innerHTML) closeModal(); });
+$("#lang-de").onclick = () => setLang("de");
+$("#lang-en").onclick = () => setLang("en");
+function setLang(l) { lang = l; try { localStorage.setItem("ol-lang", l); } catch (e) {} render(); }
+
+function confirmDel(msg, fn) {
+  openModal(`<div class="mhead"><h2>${esc(msg)}</h2></div><p class="muted">${tl("Das kann nicht rückgängig gemacht werden.", "This can't be undone.")}</p><div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" data-close>${tl("Abbrechen", "Cancel")}</button><button class="btn primary" id="cd-ok">${tl("Ja, löschen", "Yes, delete")}</button></div>`);
+  $("#cd-ok").onclick = async () => { closeModal(); await fn(); };
+}
+async function createTicketFromCall() {
+  const c = CATALOG[CALL.cat]; const s = c?.sym.find(x => x.id === CALL.sym); const m = S.machines[CALL.machine];
+  const id = uid();
+  const asked = s ? s.q.filter((_, i) => CALL.checked[i]).map(q => "✓ " + tr(q)).join("\n") : "";
+  const title = (s ? tr(s.l) : tl("Störung", "Fault")) + " – " + (m ? machineName(m) : tr(c?.name));
+  const contr = contractorsFor(c?.trade, m)[0];
+  await save("tickets", id, { title, propertyId: CALL.prop, machineId: CALL.machine || "", cat: CALL.cat, symptom: CALL.sym || "", severity: CALL.ai?.severity || s?.sev || "amber", status: "open", created: today(), contractorId: contr?.id || "", notes: [CALL.text, asked].filter(Boolean).join("\n\n"), ...(CALL.ai ? { ai: { summary: CALL.ai.summary || "" } } : {}) });
+  Object.assign(CALL, { prop: "", machine: "", cat: "", sym: "", text: "", ai: null, checked: {} });
+  location.hash = "tickets"; toast(tl("Ticket angelegt", "Ticket created"));
+  setTimeout(() => ticketModal(id), 50);
+}
+async function suggestInspections(propId) {
+  const existing = vals("inspections").filter(i => i.propertyId === propId);
+  let n = 0;
+  for (const m of vals("machines").filter(m => m.propertyId === propId)) {
+    const c = catOf(m); if (!c) continue;
+    for (const x of c.insp) {
+      const title = tr(x.l);
+      if (existing.find(i => i.machineId === m.id && (i.title === x.l.de || i.title === x.l.en || (i.titleL && i.titleL.de === x.l.de)))) continue;
+      const last = m.lastService || "";
+      await save("inspections", uid(), { title, titleL: x.l, propertyId: propId, machineId: m.id, months: x.m, last, next: last ? addMonths(last, x.m) : today() });
+      n++;
+    }
+  }
+  toast(n ? tl(`${n} Prüfungen hinzugefügt – bitte Termine prüfen`, `${n} inspections added – please check the dates`) : tl("Alle üblichen Prüfungen sind schon eingetragen", "All usual inspections are already listed"));
+}
+async function saveQR(id) {
+  const el = $("#qr canvas"); if (!el || !downloads) return;
+  const m = S.machines[id];
+  const out = document.createElement("canvas"); out.width = 420; out.height = 520;
+  const g = out.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, 420, 520); g.drawImage(el, 60, 40, 300, 300);
+  g.fillStyle = "#111"; g.font = "bold 22px Arial"; g.textAlign = "center"; g.fillText(machineName(m).slice(0, 32), 210, 385);
+  g.font = "16px Arial"; g.fillText(propName(m.propertyId).slice(0, 40), 210, 415); g.fillText((m.location || "").slice(0, 40), 210, 440);
+  g.font = "13px monospace"; g.fillStyle = "#555"; g.fillText("ID " + id, 210, 480);
+  out.toBlob(async b => { try { await downloads.save({ filename: `QR-${machineName(m).replace(/[^\wäöüÄÖÜß-]+/g, "-")}.png`, data: b }); } catch (e) { if (e && e.code !== "cancelled") toast(tl("Speichern nicht möglich", "Could not save")); } }, "image/png");
+}
+
+boot();
+</script>
