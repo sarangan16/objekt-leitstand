@@ -189,18 +189,58 @@ details summary{cursor:pointer;font-weight:700}
   .gl-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .gl-row .gl-x{grid-column:1/-1}
 }
+
+/* v2 */
+.langfix{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));z-index:40;background:var(--surface);box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.main{padding-top:64px}
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.col{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;min-width:0;display:flex;flex-direction:column;gap:8px}
+.col h3{display:flex;justify-content:space-between;align-items:center;font-size:14px}
+.col h3 .mono{font-size:12px;color:var(--muted)}
+.tcard{display:grid;grid-template-columns:4px minmax(0,1fr);gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:9px 10px 9px 0;text-decoration:none;overflow:hidden}
+.tcard:hover{border-color:var(--accent)}
+.tcard .bar{border-radius:0 2px 2px 0;background:var(--line)}
+.tcard .ttl{font-weight:700;font-size:14px;line-height:1.3}
+.tcard .meta{font-size:12px;color:var(--muted)}
+.timeline{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.tl{display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.tl:first-child{border-top:0}
+.tl .ic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);font-size:13px;color:var(--accent)}
+.tl.done .ic{background:var(--green-soft);color:var(--green)}
+.tl .when{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.qlog{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.mail{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:14px;white-space:pre-wrap;font-size:14px;overflow-wrap:anywhere}
+.kv{display:grid;grid-template-columns:minmax(120px,auto) minmax(0,1fr);gap:4px 14px;margin:0;font-size:14px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;overflow-wrap:anywhere}
+.bgroup{border-top:1px solid var(--line);padding-top:10px;margin-top:10px}
+.bgroup:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.say{border-left:3px solid var(--accent);padding:4px 0 4px 12px;font-size:15px}
+.say .en{color:var(--muted);font-size:13px;margin-top:4px}
+.rem{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.rem:first-child{border-top:0}
+.rem.due .when{color:var(--red);font-weight:700}
+.rem .when{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.alertbox{border:1px solid var(--red);background:var(--red-soft);border-radius:var(--r);padding:12px 16px;margin-bottom:18px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+@media (max-width:900px){.board{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){
+  .side{padding-right:104px}
+  .langfix{top:calc(10px + env(safe-area-inset-top,0px))}
+  .main{padding-top:20px}
+  .kv{grid-template-columns:minmax(0,1fr)}
+  .kv dd{margin-bottom:6px}
+}
 </style>
 
+<div class="lang langfix" role="group" aria-label="Sprache / Language">
+  <button type="button" id="lang-de">DE</button><button type="button" id="lang-en">EN</button>
+</div>
 <div class="shell">
   <aside class="side">
     <div class="brand">Objekt-Leitstand<small>Raavn · Facility</small></div>
     <nav class="nav" id="nav"></nav>
-    <div class="side-foot">
-      <div class="lang" role="group" aria-label="Sprache / Language">
-        <button type="button" id="lang-de">DE</button><button type="button" id="lang-en">EN</button>
-      </div>
-      <div class="mode" id="mode"></div>
-    </div>
+    <div class="side-foot"><div class="mode" id="mode"></div></div>
   </aside>
   <main class="main"><div class="wrap" id="view"></div></main>
 </div>
@@ -233,6 +273,37 @@ const SEV = {
 
 // p = Wahrscheinlichkeit 1–3, k = grobe Kosten 1–3 (€, €€, €€€)
 const CATALOG = {
+  general: {
+    code: "GEB", trade: "caretaker",
+    name: L("Allgemein / Gebäude", "General / building"),
+    what: L("Alles, was keine technische Anlage ist: Fenster, Türen, Schlösser, Beleuchtung im Flur, Böden, Außenanlagen, Schäden am Gebäude.", "Everything that isn't a technical system: windows, doors, locks, corridor lights, floors, outdoor areas, damage to the building."),
+    insp: [],
+    sym: [
+      { id: "glass", sev: "amber", l: L("Fenster / Glas kaputt", "Window / glass broken"),
+        q: [L("Kann man durch das Loch ins Gebäude (Einbruchgefahr)?", "Can someone get in through it (break-in risk)?"), L("Liegen Scherben, wo Menschen laufen?", "Is broken glass where people walk?"), L("Weiß man, wer es war (Einbruch, Unfall, Sturm)?", "Do we know the cause (break-in, accident, storm)?")],
+        act: L("Bei offenem Zugang heute notverglasen lassen. Bei Einbruch Polizei, dann Versicherung. Fotos machen.", "If the building is open, get emergency boarding today. If break-in: police, then insurance. Take photos."),
+        c: [{ t: L("Einbruch oder Vandalismus", "Break-in or vandalism"), w: L("Anzeige bei der Polizei, Versicherung meldet sich danach.", "Report to the police, then the insurance claim."), p: 2, k: 2 },
+            { t: L("Sturm oder Unfall", "Storm or accident"), w: L("Glaserei beauftragen, Schaden der Versicherung melden.", "Book a glazier, report it to the insurer."), p: 2, k: 2 }] },
+      { id: "lock", sev: "amber", l: L("Schloss / Schlüssel / Tür schließt nicht", "Lock / key / door won't lock"),
+        q: [L("Lässt sich das Gebäude noch abschließen?", "Can the building still be locked?"), L("Wurde ein Schlüssel verloren? Gehört er zu einer Schließanlage?", "Was a key lost? Is it part of a master key system?")],
+        act: L("Kann nicht abgeschlossen werden: heute Schlüsseldienst. Verlorener Generalschlüssel: Versicherung und Austausch klären.", "If it can't be locked: locksmith today. Lost master key: clarify insurance and replacement."),
+        c: [{ t: L("Schließzylinder defekt", "Lock cylinder faulty"), w: L("Zylinder tauschen, kleine Reparatur.", "Replace the cylinder, a small job."), p: 3, k: 1 },
+            { t: L("Tür hängt / Türschließer kaputt", "Door sagging / door closer broken"), w: L("Hausmeister oder Schlosser stellt sie neu ein.", "Caretaker or locksmith adjusts it."), p: 2, k: 1 }] },
+      { id: "lights", sev: "green", l: L("Licht im Flur / außen kaputt", "Corridor / outdoor lights out"),
+        q: [L("Eine Lampe oder ein ganzer Bereich?", "One lamp or a whole area?")],
+        act: L("Hausmeister bzw. Elektriker einplanen. Bei dunklen Wegen nachts zügig (Unfallgefahr).", "Schedule the caretaker or electrician. Sooner if paths are dark at night (accident risk)."),
+        c: [{ t: L("Leuchtmittel defekt", "Bulb or tube dead"), w: L("Tauschen.", "Replace it."), p: 3, k: 1 },
+            { t: L("Bewegungsmelder / Zeitschaltuhr", "Motion sensor / timer"), w: L("Falsch eingestellt oder defekt.", "Set wrong or faulty."), p: 2, k: 1 }] },
+      { id: "damage", sev: "green", l: L("Schaden am Gebäude (Wand, Boden, Graffiti)", "Building damage (wall, floor, graffiti)"),
+        q: [L("Ist es gefährlich (Stolperfalle, lose Teile)?", "Is it dangerous (trip hazard, loose parts)?"), L("Wer hat den Schaden verursacht?", "Who caused the damage?")],
+        act: L("Fotos machen, Verursacher notieren. Gefahrenstellen absperren, sonst normal beauftragen.", "Take photos, note who caused it. Block off hazards, otherwise book normally."),
+        c: [{ t: L("Abnutzung oder Anfahrschaden", "Wear or vehicle damage"), w: L("Bei Anfahrschaden zahlt meist der Verursacher.", "With vehicle damage, whoever caused it usually pays."), p: 3, k: 2 }] },
+      { id: "pests", sev: "amber", l: L("Schädlinge (Mäuse, Ratten, Insekten)", "Pests (mice, rats, insects)"),
+        q: [L("Was wurde gesehen, und wo?", "What was seen, and where?"), L("Werden dort Lebensmittel gelagert?", "Is food stored there?")],
+        act: L("Schädlingsbekämpfer diese Woche, bei Lebensmitteln sofort.", "Pest control this week, immediately if food is stored."),
+        c: [{ t: L("Zugang über Öffnungen oder Abfall", "Access through gaps or waste"), w: L("Öffnungen schließen, Abfall sauber lagern.", "Seal gaps, store waste properly."), p: 3, k: 2 }] }
+    ]
+  },
   gas_boiler: {
     code: "HZG", trade: "heating",
     name: L("Gas-Brennwertkessel", "Gas condensing boiler"),
@@ -439,7 +510,33 @@ const CATALOG = {
       { id: "alarm", sev: "red", l: L("Alarmglocke läutet / Wasser läuft", "Alarm bell ringing / water flowing"),
         act: L("Prüfen lassen, ob es brennt (112). Ohne Brand: Sprinklerfirma Notdienst, Wasserschaden begrenzen. Ventile nur auf Anweisung schließen.", "Check whether there is a fire (112). No fire: sprinkler firm emergency, limit water damage. Only close valves when told to."),
         q: [L("Brennt es oder ist es nur Wasser?", "Is there a fire or only water?")],
-        c: [{ t: L("Sprinklerkopf beschädigt (z. B. Stapler)", "Sprinkler head damaged (e.g. forklift)"), w: L("Gegen den Kopf gefahren. Kosten beim Verursacher.", "Something hit the head. Cost goes to whoever caused it."), p: 3, k: 3 }] }
+        c: [{ t: L("Sprinklerkopf beschädigt (z. B. Stapler)", "Sprinkler head damaged (e.g. forklift)"), w: L("Gegen den Kopf gefahren. Kosten beim Verursacher.", "Something hit the head. Cost goes to whoever caused it."), p: 3, k: 3 },
+            { t: L("Rohrbruch im Sprinklernetz", "Burst pipe in the sprinkler network"), w: L("Durch Frost, Korrosion oder Anfahren. Wasser läuft, bis die Firma den Abschnitt absperrt.", "From frost, corrosion or impact. Water flows until the firm shuts off that section."), p: 1, k: 3 }] },
+      { id: "pressure", sev: "amber", l: L("Druck an der Ventilstation fällt", "Pressure dropping at the valve station"),
+        q: [L("Was zeigen die Manometer an der Ventilstation (Sprinklerzentrale)? Bitte beide Werte.", "What do the gauges at the valve station show? Both values please."), L("Ist irgendwo Wasser oder Feuchtigkeit zu sehen?", "Is there water or damp anywhere?"), L("Läuft die Sprinklerpumpe öfter an als sonst?", "Is the sprinkler pump starting more often than usual?")],
+        act: L("Sprinklerfirma heute anrufen. Sinkt der Druck weiter, kann die Anlage im Brandfall versagen. Versicherer ggf. informieren.", "Call the sprinkler firm today. If the pressure keeps falling, the system may fail in a fire. Inform the insurer if needed."),
+        c: [{ t: L("Kleines Leck im Rohrnetz", "Small leak in the pipe network"), w: L("Irgendwo tropft es. Die Firma sucht und dichtet die Stelle ab.", "Something is dripping somewhere. The firm finds and seals it."), p: 3, k: 2 },
+            { t: L("Ventil an der Station undicht", "Valve at the station leaking"), w: L("Dichtung im Alarmventil verschlissen.", "Seal in the alarm valve worn."), p: 2, k: 2 },
+            { t: L("Luftverlust bei Trockenanlage", "Air loss in a dry system"), w: L("Trockenanlagen (in kalten Hallen) sind mit Luft gefüllt. Ein Leck lässt den Druck fallen und kann die Anlage auslösen.", "Dry systems (in unheated halls) are filled with air. A leak drops the pressure and can trip the system."), p: 1, k: 2 }] },
+      { id: "drip", sev: "amber", l: L("Sprinklerkopf tropft", "Sprinkler head dripping"),
+        q: [L("Wie viele Köpfe tropfen, und wo genau?", "How many heads are dripping, and where exactly?"), L("Steht Ware oder Technik darunter?", "Is stock or equipment underneath?")],
+        act: L("Ware darunter schützen (Folie, Eimer). Sprinklerfirma heute. Nicht selbst am Kopf drehen.", "Protect stock underneath (sheeting, bucket). Sprinkler firm today. Don't touch the head yourself."),
+        c: [{ t: L("Kopf beschädigt oder korrodiert", "Head damaged or corroded"), w: L("Kopf wird getauscht, dauert meist kurz.", "The head is replaced, usually quick."), p: 3, k: 1 },
+            { t: L("Kondenswasser an der Leitung", "Condensation on the pipe"), w: L("Kaltes Rohr in warmer, feuchter Luft. Kein Leck, aber prüfen lassen.", "Cold pipe in warm, damp air. Not a leak, but have it checked."), p: 1, k: 1 }] },
+      { id: "pump_fault", sev: "amber", l: L("Störung Sprinklerpumpe / Zentrale", "Fault on sprinkler pump / control panel"),
+        q: [L("Was steht auf der Anzeige oder welche Lampe leuchtet?", "What does the display say, or which light is on?"), L("Ist es eine Diesel- oder Elektropumpe?", "Is it a diesel or an electric pump?")],
+        act: L("Sprinklerfirma noch heute. Eine Pumpenstörung heißt: im Brandfall evtl. zu wenig Wasser.", "Sprinkler firm today. A pump fault means possibly too little water in a fire."),
+        c: [{ t: L("Stromversorgung der Pumpe gestört", "Pump power supply fault"), w: L("Sicherung oder Steuerung. Elektriker der Sprinklerfirma.", "Fuse or controls. The sprinkler firm's electrician."), p: 2, k: 2 },
+            { t: L("Dieselpumpe: Batterie oder Kraftstoff", "Diesel pump: battery or fuel"), w: L("Batterie schwach oder Tank zu leer.", "Battery weak or tank too low."), p: 2, k: 1 },
+            { t: L("Wasservorrat zu niedrig", "Water supply too low"), w: L("Vorratsbehälter nicht voll. Nachfüllen und Ursache suchen.", "Storage tank not full. Refill and find the cause."), p: 1, k: 2 }] },
+      { id: "frozen", sev: "red", l: L("Frostgefahr / eingefrorene Leitung", "Risk of frost / frozen pipe"),
+        q: [L("Wie kalt ist es in der Halle? Ist die Heizung aus?", "How cold is it in the hall? Is the heating off?"), L("Sind Tore lange offen gewesen?", "Have doors been open for a long time?")],
+        act: L("Sofort Sprinklerfirma. Gefrorene Leitungen können platzen und die Anlage unbrauchbar machen. Tore schließen, Halle temperieren.", "Sprinkler firm at once. Frozen pipes can burst and disable the system. Close doors, heat the hall."),
+        c: [{ t: L("Nassanlage in ungeheiztem Bereich", "Wet system in an unheated area"), w: L("Unter 4 °C kann Wasser in den Rohren gefrieren.", "Below 4 °C water in the pipes can freeze."), p: 3, k: 3 }] },
+      { id: "storage", sev: "green", l: L("Ware zu hoch gestapelt", "Stock stacked too high"),
+        q: [L("Wie viel Abstand ist zwischen Ware und Sprinklerköpfen?", "How much gap is there between stock and the sprinkler heads?")],
+        act: L("Mieter schriftlich auffordern, den Abstand einzuhalten (meist mind. 50 cm unter den Köpfen, je nach Auflage). Kein Techniker nötig.", "Ask the tenant in writing to keep the gap (usually at least 50 cm below the heads, depending on rules). No technician needed."),
+        c: [{ t: L("Sprühbild der Köpfe blockiert", "Spray pattern blocked"), w: L("Der Sprinkler kann das Feuer nicht erreichen. Versicherungsrisiko.", "The sprinkler can't reach the fire. Insurance risk."), p: 3, k: 1 }] }
     ]
   },
   rwa: {
@@ -592,34 +689,96 @@ const GLOSSARY = [
   ["ZÜS", "Approved inspection body", "Zugelassene Überwachungsstelle, z. B. TÜV, DEKRA.", "Approved inspection body, e.g. TÜV, DEKRA."]
 ];
 
+const OTHER_CAT = { code: "ANL", trade: "other", name: L("Sonstige Anlage", "Other equipment"), what: L("Eine Anlage, die nicht in der Liste steht. Lade ein Foto hoch, dann erklärt die KI, was sie ist.", "Equipment that isn't in the list. Upload a photo and the AI explains what it is."), insp: [], sym: [] };
+
+const LOG_TYPES = {
+  created: { i: "＋", l: L("Ticket angelegt", "Ticket created") },
+  status: { i: "◐", l: L("Status geändert", "Status changed") },
+  call: { i: "☎", l: L("Dienstleister angerufen", "Called contractor") },
+  email: { i: "✉", l: L("E-Mail gesendet", "Email sent") },
+  noanswer: { i: "✕", l: L("Keine Antwort", "No answer") },
+  callback: { i: "↺", l: L("Rückruf erwartet", "Callback expected") },
+  appointment: { i: "◷", l: L("Termin vereinbart", "Appointment set") },
+  onsite: { i: "⚑", l: L("Techniker vor Ort", "Technician on site") },
+  quote: { i: "€", l: L("Angebot erhalten", "Quote received") },
+  invoice: { i: "▤", l: L("Rechnung erhalten", "Invoice received") },
+  tenant: { i: "⌂", l: L("Mieter informiert", "Tenant informed") },
+  note: { i: "✎", l: L("Notiz", "Note") },
+  done: { i: "✓", l: L("Erledigt", "Done") }
+};
+const QUICK_LOG = ["call", "email", "noanswer", "callback", "appointment", "onsite", "invoice", "tenant"];
+
+const PAYERS = {
+  owner: L("Eigentümer / Vermieter", "Owner / landlord"),
+  tenant: L("Weiterberechnung an Mieter", "Recharge to tenant"),
+  insurance: L("Versicherung", "Insurance"),
+  service: L("Nebenkosten (umlagefähig)", "Service charges (passed on)"),
+  contract: L("Wartungsvertrag / Gewährleistung", "Service contract / warranty"),
+  open: L("Noch offen", "Not decided yet")
+};
+
+const CONTRACTOR_QS = [
+  L("Wann können Sie frühestens kommen?", "When is the earliest you can come?"),
+  L("Mit welchen Kosten müssen wir ungefähr rechnen?", "Roughly what will it cost?"),
+  L("Ist die Anfahrt enthalten? Gibt es einen Notdienstzuschlag?", "Is the call-out included? Is there an emergency surcharge?"),
+  L("Fällt das unter den Wartungsvertrag oder die Gewährleistung?", "Is this covered by the service contract or warranty?"),
+  L("Können Sie mir vorab ein schriftliches Angebot schicken?", "Can you send me a written quote first?"),
+  L("Brauchen Sie Zugang zu bestimmten Räumen oder einen Ansprechpartner vor Ort?", "Do you need access to certain rooms or a contact person on site?"),
+  L("Bitte schicken Sie nach dem Einsatz einen Arbeitsbericht mit.", "Please send a job report after the visit.")
+];
+
+const BUILDING_GROUPS = [
+  { t: L("Gebäude", "Building"), f: [["yearBuilt", L("Baujahr", "Year built")], ["floors", L("Geschosse", "Floors")], ["units", L("Hallen / Einheiten", "Halls / units")], ["bays", L("Rampen / Tore", "Loading bays / doors")], ["parking", L("Stellplätze", "Parking spaces")]] },
+  { t: L("Wo ist was?", "Where is what?"), f: [["waterValve", L("Hauptabsperrhahn Wasser", "Main water stop valve")], ["gasValve", L("Gashaupthahn", "Main gas valve")], ["mainPower", L("Hauptschalter Strom", "Main power switch")], ["fuseBoards", L("Sicherungskästen", "Fuse boards")], ["heatingRoom", L("Heizraum / Technikraum", "Boiler / plant room")]] },
+  { t: L("Zähler", "Meters"), f: [["meterWater", L("Wasserzähler-Nr.", "Water meter no.")], ["meterGas", L("Gaszähler-Nr.", "Gas meter no.")], ["meterPower", L("Stromzähler-Nr.", "Electricity meter no.")], ["meterHeat", L("Wärmezähler-Nr.", "Heat meter no.")]] },
+  { t: L("Zugang", "Access"), f: [["keys", L("Schlüssel (wer hat welche)", "Keys (who has which)")], ["alarm", L("Alarmanlage: Ansprechpartner (keinen Code eintragen)", "Alarm: contact person (don't enter the code)")], ["access", L("Zugangszeiten", "Access hours")]] },
+  { t: L("Störungsnummern Versorger", "Utility fault lines"), f: [["utilGas", L("Gas", "Gas")], ["utilWater", L("Wasser", "Water")], ["utilPower", L("Strom", "Electricity")], ["utilHeat", L("Fernwärme", "District heating")]] }
+];
+
+const CONTACT_ROLES = {
+  tenant: L("Mieter", "Tenant"),
+  caretaker: L("Hausmeister", "Caretaker"),
+  owner: L("Eigentümer", "Owner"),
+  security: L("Wachdienst / Schlüssel", "Security / keys"),
+  utility: L("Versorger", "Utility"),
+  other: L("Sonstige", "Other")
+};
+
 </script>
 <script>
 "use strict";
 const APP_URL = "https://claude.ai/artifact/3NRcXCaMXsrBmcqN9ujNja";
-const COLS = ["properties", "machines", "contractors", "tickets", "inspections"];
-const S = { properties: {}, machines: {}, contractors: {}, tickets: {}, inspections: {}, settings: { limit: 500 } };
+const COLS = ["properties", "machines", "contractors", "tickets", "inspections", "reminders"];
+const S = { properties: {}, machines: {}, contractors: {}, tickets: {}, inspections: {}, reminders: {}, settings: { limit: 500 } };
 const loaded = {};
 let db = null, sample = null, assets = null, downloads = null, imgOK = false;
-let mode = "connecting"; // connecting | db | local
+let mode = "connecting";
 let lang = "de";
 try { lang = localStorage.getItem("ol-lang") || "de"; } catch (e) {}
-const CALL = { prop: "", machine: "", cat: "", sym: "", text: "", ai: null, busy: false, checked: {} };
-let ticketFilter = "open";
-let glossQ = "";
-let catOpen = "";
+const CALL = { prop: "", machine: "", cat: "", sym: "", sev: "amber", text: "", ai: null, busy: false, checked: {} };
+const UI = { ticketFilter: "open", glossQ: "", catOpen: "", boardProp: "", mailKind: "order", busy: {} };
+const ALERTED = new Set();
 
 const $ = (s, r = document) => r.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const tl = (de, en) => lang === "en" ? en : de;
 const tr = o => o ? (o[lang] || o.de || "") : "";
 const uid = () => Math.random().toString(36).slice(2, 10);
-const today = () => new Date().toISOString().slice(0, 10);
+const pad = n => String(n).padStart(2, "0");
+const localISO = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const today = () => localISO().slice(0, 10);
+const nowLocal = () => localISO();
 const money = n => new Intl.NumberFormat(lang === "en" ? "en-GB" : "de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(Number(n) || 0);
-const fmtDate = d => { if (!d) return "–"; const x = new Date(d + "T12:00:00"); return isNaN(x) ? d : x.toLocaleDateString(lang === "en" ? "en-GB" : "de-DE", { day: "2-digit", month: "short", year: "numeric" }); };
-const addMonths = (d, m) => { const x = new Date((d || today()) + "T12:00:00"); x.setMonth(x.getMonth() + Number(m || 12)); return x.toISOString().slice(0, 10); };
-const daysUntil = d => Math.round((new Date(d + "T12:00:00") - new Date(today() + "T12:00:00")) / 864e5);
+const moneyDe = n => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(Number(n) || 0);
+const loc = () => lang === "en" ? "en-GB" : "de-DE";
+const fmtDate = (d, l) => { if (!d) return "–"; const x = new Date(d.length > 10 ? d : d + "T12:00:00"); return isNaN(x) ? d : x.toLocaleDateString(l || loc(), { day: "2-digit", month: "short", year: "numeric" }); };
+const fmtDT = (d, l) => { if (!d) return "–"; const x = new Date(d); return isNaN(x) ? d : x.toLocaleString(l || loc(), { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }); };
+const fmtDTde = d => d ? new Date(d).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) + " Uhr" : "";
+const addMonths = (d, m) => { const x = new Date((d || today()) + "T12:00:00"); x.setMonth(x.getMonth() + Number(m || 12)); return localISO(x).slice(0, 10); };
+const daysUntil = d => Math.round((new Date(d.slice(0, 10) + "T12:00:00") - new Date(today() + "T12:00:00")) / 864e5);
 const blob = id => id ? "/_blob/" + id : "";
 const vals = col => Object.entries(S[col]).map(([id, v]) => ({ id, ...v }));
+const clean = o => JSON.parse(JSON.stringify(o, (k, v) => k.startsWith("_") ? undefined : v));
 
 function toast(msg) {
   const r = $("#toast-root");
@@ -631,7 +790,7 @@ function toast(msg) {
 async function save(col, id, data) {
   S[col][id] = data; render();
   if (mode !== "db") return;
-  try { await db.collection(col).doc(id).set(JSON.parse(JSON.stringify(data))); }
+  try { await db.collection(col).doc(id).set(clean(data)); }
   catch (e) { toast(tl("Speichern fehlgeschlagen: ", "Saving failed: ") + (e.message || e.code)); }
 }
 async function patch(col, id, changes) { const cur = S[col][id] || {}; return save(col, id, { ...cur, ...changes }); }
@@ -642,7 +801,7 @@ async function remove(col, id) {
 }
 async function saveSettings(ch) {
   S.settings = { ...S.settings, ...ch }; render();
-  if (mode === "db") { try { await db.doc("settings/main").set(JSON.parse(JSON.stringify(S.settings))); } catch (e) { toast(tl("Speichern fehlgeschlagen", "Saving failed")); } }
+  if (mode === "db") { try { await db.doc("settings/main").set(clean(S.settings)); } catch (e) { toast(tl("Speichern fehlgeschlagen", "Saving failed")); } }
 }
 
 async function boot() {
@@ -655,10 +814,30 @@ async function boot() {
   if (!db) { mode = "local"; COLS.forEach(c => loaded[c] = true); render(); return; }
   mode = "db";
   COLS.forEach(col => db.collection(col).onSnapshot(snap => {
-    const next = {}; snap.docs.forEach(d => next[d.id] = { ...d.data() });
+    const busy = {}; Object.entries(S[col]).forEach(([k, v]) => { if (v && v._busy) busy[k] = true; });
+    const next = {}; snap.docs.forEach(d => { next[d.id] = { ...d.data() }; if (busy[d.id]) next[d.id]._busy = true; });
     S[col] = next; loaded[col] = true; render();
-  }, err => { loaded[col] = true; toast(tl("Daten konnten nicht geladen werden", "Could not load data")); render(); }));
+  }, () => { loaded[col] = true; toast(tl("Daten konnten nicht geladen werden", "Could not load data")); render(); }));
   db.doc("settings/main").onSnapshot(d => { if (d.exists) S.settings = { limit: 500, ...d.data() }; render(); }, () => {});
+}
+
+/* ---------- Kategorien ---------- */
+function customCat(m) {
+  const ct = m && m.customType; if (!ct) return OTHER_CAT;
+  const W = s => L(String(s || ""), String(s || ""));
+  return {
+    code: (ct.code || "ANL").slice(0, 4).toUpperCase(), trade: TRADES[ct.trade] ? ct.trade : "other", name: W(ct.name), what: W(ct.what), insp: [], custom: true,
+    sym: (ct.faults || []).map((f, i) => ({ id: "c" + i, sev: SEV[f.severity] ? f.severity : "amber", l: W(f.title), act: W(f.action), q: (f.questions || []).map(W),
+      c: (f.causes || []).map(c => ({ t: W(c.title), w: W(c.explanation), p: Math.max(1, Math.min(3, Number(c.likelihood) || 2)), k: Math.max(1, Math.min(3, Number(c.cost) || 2)) })) }))
+  };
+}
+function catFor(key, m) { if (key === "other") return customCat(m); return CATALOG[key] || null; }
+const catOf = m => m ? catFor(m.cat, m) : null;
+const callCat = () => catFor(CALL.cat, S.machines[CALL.machine]);
+const ticketCat = t => catFor(t.cat, S.machines[t.machineId]);
+function symOf(t) {
+  if (t.symptom === "__other" || !t.symptom) return { l: L("Sonstiges Problem", "Other problem") };
+  return ticketCat(t)?.sym.find(s => s.id === t.symptom) || { l: L("Störung", "Fault") };
 }
 
 /* ---------- Icons ---------- */
@@ -673,25 +852,31 @@ const I = {
   gl: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 2h8l2 2v10H3z"/><path d="M6 6h4M6 9h4"/></svg>'
 };
 
-/* ---------- Router ---------- */
+/* ---------- Router & Rendern ---------- */
 function route() { return (location.hash || "#dashboard").slice(1) || "dashboard"; }
-window.addEventListener("hashchange", () => { render(); window.scrollTo(0, 0); });
+window.addEventListener("hashchange", () => { render(true); try { window.scrollTo(0, 0); } catch (e) {} });
+let lastRoute = "", pendingRender = false;
+function typing() { const ae = document.activeElement; return ae && $("#view").contains(ae) && (ae.tagName === "TEXTAREA" || (ae.tagName === "INPUT" && !["checkbox", "file", "radio"].includes(ae.type))); }
+document.addEventListener("focusout", () => setTimeout(() => { if (pendingRender && !typing()) render(true); }, 0));
+
+const dueReminders = () => vals("reminders").filter(r => !r.done && r.at && r.at <= nowLocal());
 
 function renderNav() {
   const r = route();
-  const openRed = vals("tickets").filter(t => t.status !== "done").length;
+  const open = vals("tickets").filter(t => t.status !== "done").length;
   const overdue = vals("inspections").filter(i => i.next && daysUntil(i.next) < 0).length;
+  const due = dueReminders().length;
   const items = [
     ["call", I.call, tl("Störung aufnehmen", "Log a fault"), "call"],
-    ["dashboard", I.dash, tl("Übersicht", "Overview")],
+    ["dashboard", I.dash, tl("Übersicht", "Overview"), "", due],
     ["objects", I.obj, tl("Objekte", "Properties")],
-    ["tickets", I.rep, tl("Reparaturen", "Repairs"), "", openRed],
+    ["tickets", I.rep, tl("Reparaturen", "Repairs"), "", open],
     ["inspections", I.insp, tl("Prüfungen", "Inspections"), "", overdue],
     ["contractors", I.con, tl("Dienstleister", "Contractors")],
     ["catalog", I.cat, tl("Anlagen-Wissen", "Equipment guide")],
     ["glossary", I.gl, tl("Wörterbuch", "Glossary")]
   ];
-  const active = r.startsWith("p-") ? "objects" : r.startsWith("m-") ? "objects" : r;
+  const active = /^[pm]-/.test(r) ? "objects" : r.startsWith("t-") ? "tickets" : r;
   $("#nav").innerHTML = items.map(([k, ic, label, cls, cnt]) =>
     `<a href="#${k}" class="${cls || ""} ${active === k ? "on" : ""}">${ic}<span>${esc(label)}</span>${cnt ? `<span class="cnt">${cnt}</span>` : ""}</a>`).join("");
   $("#lang-de").classList.toggle("on", lang === "de");
@@ -700,9 +885,11 @@ function renderNav() {
   document.documentElement.lang = lang;
 }
 
-function render() {
+function render(force) {
   renderNav();
   const r = route();
+  if (!force && r === lastRoute && typing()) { pendingRender = true; return; }
+  pendingRender = false; lastRoute = r;
   const v = $("#view");
   const ready = COLS.every(c => loaded[c]);
   let html = "";
@@ -712,6 +899,7 @@ function render() {
   else if (r === "objects") html += viewObjects();
   else if (r.startsWith("p-")) html += viewProperty(r.slice(2));
   else if (r.startsWith("m-")) html += viewMachine(r.slice(2));
+  else if (r.startsWith("t-")) html += viewTicket(r.slice(2));
   else if (r === "tickets") html += viewTickets();
   else if (r === "inspections") html += viewInspections();
   else if (r === "contractors") html += viewContractors();
@@ -722,16 +910,16 @@ function render() {
   afterRender(r);
 }
 
-/* ---------- Helfer für Anzeige ---------- */
-const sevPill = s => s ? `<span class="sev ${s}">${esc(tr(SEV[s].label))}</span>` : "";
-const catOf = m => CATALOG[m && m.cat] || null;
+/* ---------- Anzeige-Helfer ---------- */
+const sevPill = s => s && SEV[s] ? `<span class="sev ${s}">${esc(tr(SEV[s].label))}</span>` : "";
 const machineName = m => m ? (m.name || tr(catOf(m)?.name) || tl("Anlage", "Equipment")) : "";
 const propName = id => S.properties[id]?.name || tl("Unbekanntes Objekt", "Unknown property");
 const STATUS = { open: L("Offen", "Open"), assigned: L("Beauftragt", "Assigned"), waiting: L("Wartet auf Angebot", "Waiting for quote"), done: L("Erledigt", "Done") };
 const meter = (n, max = 3) => `<span class="meter" aria-label="${n}/${max}">${Array.from({ length: max }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</span>`;
 const costSigns = k => "€".repeat(k || 1);
-const inspTitle = i => i.titleL ? tr(i.titleL) : i.title;
 const example = o => o && o.example ? ` <span class="tag">${tl("Beispiel", "Example")}</span>` : "";
+const inspTitle = i => i.titleL ? tr(i.titleL) : i.title;
+const ago = d => { const n = -daysUntil(d); return n <= 0 ? tl("heute", "today") : n === 1 ? tl("seit gestern", "since yesterday") : tl(`seit ${n} Tagen`, `${n} days`); };
 
 function contractorsFor(trade, machine) {
   const list = [];
@@ -739,56 +927,78 @@ function contractorsFor(trade, machine) {
   vals("contractors").filter(c => c.trade === trade && !list.find(x => x.id === c.id)).forEach(c => list.push(c));
   return list;
 }
+function copyBtn(text) { return text ? `<button class="btn sm" data-copy="${esc(text)}">${tl("Kopieren", "Copy")}</button>` : ""; }
 function contactCard(c) {
   return `<div class="contact">
-    <div><div class="ttl" style="font-weight:700">${esc(c.name)}${c.main ? ` <span class="tag">${tl("zuständig", "assigned")}</span>` : ""}${c.emergency ? ` <span class="tag">24/7</span>` : ""}</div>
-    <div class="muted" style="font-size:13px">${esc(tr(TRADES[c.trade]) || "")}${c.notes ? " · " + esc(c.notes) : ""}</div></div>
-    <div class="row"><span class="phone">${esc(c.phone || "–")}</span>${c.phone ? `<button class="btn sm" data-copy="${esc(c.phone)}">${tl("Kopieren", "Copy")}</button>` : ""}</div>
-  </div>`;
-}
-
-/* ---------- Übersicht ---------- */
-function viewDashboard() {
-  const tickets = vals("tickets");
-  const open = tickets.filter(t => t.status !== "done");
-  const cnt = s => open.filter(t => t.severity === s).length;
-  const insp = vals("inspections").filter(i => i.next).sort((a, b) => a.next.localeCompare(b.next));
-  const due = insp.filter(i => daysUntil(i.next) <= 60);
-  const overdue = insp.filter(i => daysUntil(i.next) < 0).length;
-  const rent = vals("properties").reduce((s, p) => s + (Number(p.rent) || 0), 0);
-  const yr = new Date().getFullYear().toString();
-  const repairs = tickets.filter(t => (t.created || "").startsWith(yr)).reduce((s, t) => s + (Number(t.cost) || 0), 0);
-  const props = vals("properties");
-  if (!props.length) return `<div class="head"><div><div class="eyebrow">${tl("Übersicht", "Overview")}</div><h1>${tl("Willkommen im Objekt-Leitstand", "Welcome to your property control room")}</h1></div></div>
-    <div class="empty"><b>${tl("Noch keine Objekte", "No properties yet")}</b>${tl("Lege dein erstes Objekt an, dann füge seine Anlagen hinzu (Heizung, Tore, Brandmeldeanlage …).", "Add your first property, then add its equipment (heating, doors, fire alarm …).")}<br><br><button class="btn primary" data-act="new-prop">${tl("Objekt anlegen", "Add property")}</button></div>`;
-  return `
-  <div class="head"><div><div class="eyebrow">${tl("Übersicht", "Overview")} · ${fmtDate(today())}</div><h1>${open.length ? tl(`${open.length} offene Störungen`, `${open.length} open faults`) : tl("Alles ruhig", "All quiet")}</h1></div>
-    <a class="btn primary" href="#call">${I.call.replace('<svg', '<svg width="16" height="16"')} ${tl("Anruf: Störung aufnehmen", "Call: log a fault")}</a></div>
-  <div class="stats">
-    <div class="stat"><span class="eyebrow">${tl("Offene Störungen", "Open faults")}</span><b>${open.length}</b><span class="row" style="gap:6px">${cnt("red") ? sevPill("red") + " " + cnt("red") : ""} ${cnt("amber") ? sevPill("amber") + " " + cnt("amber") : ""} ${cnt("green") ? sevPill("green") + " " + cnt("green") : ""}</span></div>
-    <div class="stat"><span class="eyebrow">${tl("Prüfungen fällig (60 Tage)", "Inspections due (60 days)")}</span><b>${due.length}</b><span class="sub ${overdue ? "due-over" : ""}">${overdue ? tl(`${overdue} überfällig`, `${overdue} overdue`) : tl("nichts überfällig", "none overdue")}</span></div>
-    <div class="stat"><span class="eyebrow">${tl("Miete pro Monat", "Rent per month")}</span><b>${money(rent)}</b><span class="sub">${props.length} ${tl("Objekte", "properties")}</span></div>
-    <div class="stat"><span class="eyebrow">${tl("Reparaturkosten", "Repair costs")} ${yr}</span><b>${money(repairs)}</b><span class="sub">${tl("Freigabegrenze", "Approval limit")} ${money(S.settings.limit)}</span></div>
-  </div>
-  <div class="grid g2">
-    <section class="panel"><h2>${tl("Offene Störungen", "Open faults")}</h2>${open.length ? `<div class="list">${open.sort((a, b) => "rag".indexOf(a.severity?.[0]) - "rag".indexOf(b.severity?.[0])).slice(0, 8).map(ticketRow).join("")}</div>` : `<p class="muted">${tl("Keine offenen Störungen.", "No open faults.")}</p>`}</section>
-    <section class="panel"><h2>${tl("Nächste Prüfungen", "Upcoming inspections")}</h2>${insp.length ? `<div class="list">${insp.slice(0, 8).map(inspRow).join("")}</div>` : `<p class="muted">${tl("Noch keine Prüfungen eingetragen.", "No inspections yet.")}</p>`}</section>
-    <section class="panel"><h2>${tl("Objekte", "Properties")}</h2><div class="list">${props.map(p => {
-      const o = tickets.filter(t => t.propertyId === p.id && t.status !== "done").length;
-      return `<a class="item" href="#p-${p.id}"><span class="bar ${o ? "amber" : ""}"></span><span><span class="ttl">${esc(p.name)}</span>${example(p)}<br><span class="meta">${esc(p.tenant || "–")} · ${esc(p.address || "")}</span></span><span class="mono">${money(p.rent)}</span></a>`; }).join("")}</div></section>
-    <section class="panel"><h2>${tl("Einstellungen", "Preferences")}</h2>
-      <label class="field"><span>${tl("Freigabegrenze für Reparaturen (€)", "Approval limit for repairs (€)")}</span><input type="number" id="limit-input" min="0" step="50" value="${esc(S.settings.limit)}"></label>
-      <p class="muted" style="font-size:13px;margin:8px 0 0">${tl("Liegt ein Angebot darüber, verlangt die App ein zweites Angebot und hilft beim Verhandeln.", "Quotes above this ask for a second quote and get negotiation help.")}</p></section>
+    <div><div style="font-weight:700">${esc(c.name)}${c.main ? ` <span class="tag">${tl("zuständig", "assigned")}</span>` : ""}${c.emergency ? ` <span class="tag">24/7</span>` : ""}</div>
+    <div class="muted" style="font-size:13px">${esc(c.roleLabel || tr(TRADES[c.trade]) || "")}${c.notes ? " · " + esc(c.notes) : ""}</div></div>
+    <div class="row"><span class="phone">${esc(c.phone || "–")}</span>${copyBtn(c.phone)}</div>
   </div>`;
 }
 function ticketRow(t) {
   const m = S.machines[t.machineId];
-  return `<div class="item" data-ticket="${t.id}"><span class="bar ${t.severity || ""}"></span><span><span class="ttl">${esc(t.title)}</span>${example(t)}<br><span class="meta">${esc(propName(t.propertyId))}${m ? " · " + esc(machineName(m)) : ""} · ${esc(tr(STATUS[t.status] || STATUS.open))}</span></span><span>${sevPill(t.severity)}</span></div>`;
+  return `<a class="item" href="#t-${t.id}"><span class="bar ${t.severity || ""}"></span><span><span class="ttl">${esc(t.title)}</span>${example(t)}<br><span class="meta">${esc(propName(t.propertyId))}${m ? " · " + esc(machineName(m)) : ""} · ${esc(tr(STATUS[t.status] || STATUS.open))}</span></span><span>${sevPill(t.severity)}</span></a>`;
 }
 function inspRow(i) {
   const d = daysUntil(i.next); const cls = d < 0 ? "due-over" : d <= 30 ? "due-soon" : "";
   const m = S.machines[i.machineId];
-  return `<div class="item" data-insp="${i.id}"><span class="bar ${d < 0 ? "red" : d <= 30 ? "amber" : ""}"></span><span><span class="ttl">${esc(inspTitle(i))}</span>${example(i)}<br><span class="meta">${esc(propName(i.propertyId))}${m ? " · " + esc(machineName(m)) : ""}</span></span><span class="mono ${cls}">${fmtDate(i.next)}</span></div>`;
+  return `<div class="item" data-insp="${i.id}" tabindex="0"><span class="bar ${d < 0 ? "red" : d <= 30 ? "amber" : ""}"></span><span><span class="ttl">${esc(inspTitle(i))}</span>${example(i)}<br><span class="meta">${esc(propName(i.propertyId))}${m ? " · " + esc(machineName(m)) : ""}</span></span><span class="mono ${cls}">${fmtDate(i.next)}</span></div>`;
+}
+function remRow(r, showProp) {
+  const due = !r.done && r.at <= nowLocal();
+  return `<div class="rem ${due ? "due" : ""}"><div><div style="font-weight:700;${r.done ? "text-decoration:line-through;color:var(--muted)" : ""}">${esc(r.subject)}${example(r)}</div><div class="when">${fmtDT(r.at)}${showProp ? " · " + esc(propName(r.propertyId)) : ""}</div>${r.note ? `<div class="muted" style="font-size:13px">${esc(r.note)}</div>` : ""}</div>
+    <div class="row" style="flex-wrap:nowrap">${r.done ? "" : `<button class="btn sm" data-act="rem-done" data-id="${r.id}">${tl("Erledigt", "Done")}</button>`}<button class="btn sm ghost" data-act="edit-rem" data-id="${r.id}">${tl("Bearbeiten", "Edit")}</button></div></div>`;
+}
+
+/* ---------- Übersicht ---------- */
+function viewDashboard() {
+  const props = vals("properties");
+  if (!props.length) return `<div class="head"><div><div class="eyebrow">${tl("Übersicht", "Overview")}</div><h1>${tl("Willkommen im Objekt-Leitstand", "Welcome to your property control room")}</h1></div></div>
+    <div class="empty"><b>${tl("Noch keine Objekte", "No properties yet")}</b>${tl("Lege dein erstes Objekt an, dann füge seine Anlagen hinzu.", "Add your first property, then add its equipment.")}<br><br><button class="btn primary" data-act="new-prop">${tl("Objekt anlegen", "Add property")}</button></div>`;
+  const tickets = vals("tickets");
+  const open = tickets.filter(t => t.status !== "done");
+  const insp = vals("inspections").filter(i => i.next).sort((a, b) => a.next.localeCompare(b.next));
+  const due = insp.filter(i => daysUntil(i.next) <= 60);
+  const overdue = insp.filter(i => daysUntil(i.next) < 0).length;
+  const rent = props.reduce((s, p) => s + (Number(p.rent) || 0), 0);
+  const yr = String(new Date().getFullYear());
+  const repairs = tickets.filter(t => (t.created || "").startsWith(yr)).reduce((s, t) => s + (Number(t.cost) || 0), 0);
+  const endToday = today() + "T23:59";
+  const rems = vals("reminders").filter(r => !r.done && r.at && r.at <= endToday).sort((a, b) => a.at.localeCompare(b.at));
+  // Board
+  const bp = UI.boardProp;
+  const inP = t => !bp || t.propertyId === bp;
+  const todo = tickets.filter(t => inP(t) && (t.status || "open") === "open");
+  const prog = tickets.filter(t => inP(t) && (t.status === "assigned" || t.status === "waiting"));
+  const done = tickets.filter(t => inP(t) && t.status === "done" && daysUntil((t.doneAt || t.created || today())) >= -30);
+  const sevOrder = t => ["red", "amber", "green"].indexOf(t.severity);
+  const card = t => { const m = S.machines[t.machineId]; const last = (t.log || []).slice(-1)[0];
+    return `<a class="tcard" href="#t-${t.id}"><span class="bar ${t.status === "done" ? "green" : t.severity || ""}"></span><span><span class="ttl">${esc(t.title)}</span><br><span class="meta">${esc(propName(t.propertyId))}${m ? " · " + esc(machineName(m)) : ""}</span><br><span class="meta">${t.status === "done" ? tl("erledigt ", "done ") + fmtDate(t.doneAt || t.created) : ago(t.created || today())}${last && t.status !== "done" ? " · " + esc(tr(LOG_TYPES[last.type]?.l)) : ""}</span></span></a>`; };
+  const col = (title, list, emptyTxt) => `<div class="col"><h3>${title}<span class="mono">${list.length}</span></h3>${list.length ? list.sort((a, b) => sevOrder(a) - sevOrder(b)).map(card).join("") : `<p class="muted" style="font-size:13px;margin:0">${emptyTxt}</p>`}</div>`;
+  return `
+  <div class="head"><div><div class="eyebrow">${tl("Übersicht", "Overview")} · ${fmtDate(today())}</div><h1>${open.length ? tl(`${open.length} offene Störungen`, `${open.length} open faults`) : tl("Alles ruhig", "All quiet")}</h1></div>
+    <a class="btn primary" href="#call">${tl("Anruf: Störung aufnehmen", "Call: log a fault")}</a></div>
+  ${rems.length ? `<section class="alertbox"><div class="row" style="justify-content:space-between;margin-bottom:4px"><h2>${tl("Heute & überfällig", "Today & overdue")}</h2><span class="mono">${rems.length}</span></div>${rems.map(r => remRow(r, true)).join("")}</section>` : ""}
+  <div class="stats">
+    <div class="stat"><span class="eyebrow">${tl("Offene Störungen", "Open faults")}</span><b>${open.length}</b><span class="sub">${["red", "amber", "green"].map(s => { const n = open.filter(t => t.severity === s).length; return n ? `${n} ${esc(tr(SEV[s].label))}` : ""; }).filter(Boolean).join(" · ") || "–"}</span></div>
+    <div class="stat"><span class="eyebrow">${tl("Prüfungen fällig (60 Tage)", "Inspections due (60 days)")}</span><b>${due.length}</b><span class="sub ${overdue ? "due-over" : ""}">${overdue ? tl(`${overdue} überfällig`, `${overdue} overdue`) : tl("nichts überfällig", "none overdue")}</span></div>
+    <div class="stat"><span class="eyebrow">${tl("Miete pro Monat", "Rent per month")}</span><b>${money(rent)}</b><span class="sub">${props.length} ${tl("Objekte", "properties")}</span></div>
+    <div class="stat"><span class="eyebrow">${tl("Reparaturkosten", "Repair costs")} ${yr}</span><b>${money(repairs)}</b><span class="sub">${tl("Freigabegrenze", "Approval limit")} ${money(S.settings.limit)}</span></div>
+  </div>
+  <section style="margin-bottom:18px"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2>${tl("Aufgaben", "To do")}</h2>
+    <select id="board-prop" style="width:auto;min-width:200px"><option value="">${tl("Alle Objekte", "All properties")}</option>${props.map(p => `<option value="${p.id}" ${bp === p.id ? "selected" : ""}>${esc(p.name)}</option>`).join("")}</select></div>
+    <div class="board">${col(tl("Zu erledigen", "To do"), todo, tl("Nichts offen.", "Nothing open."))}${col(tl("In Arbeit", "In progress"), prog, tl("Nichts in Arbeit.", "Nothing in progress."))}${col(tl("Erledigt (30 Tage)", "Done (30 days)"), done, tl("Noch nichts erledigt.", "Nothing done yet."))}</div></section>
+  <div class="grid g2">
+    <section class="panel"><h2>${tl("Nächste Prüfungen", "Upcoming inspections")}</h2>${insp.length ? `<div class="list">${insp.slice(0, 6).map(inspRow).join("")}</div>` : `<p class="muted">${tl("Noch keine Prüfungen eingetragen.", "No inspections yet.")}</p>`}</section>
+    <section class="panel"><h2>${tl("Objekte", "Properties")}</h2><div class="list">${props.map(p => {
+      const o = open.filter(t => t.propertyId === p.id).length;
+      return `<a class="item" href="#p-${p.id}"><span class="bar ${o ? "amber" : ""}"></span><span><span class="ttl">${esc(p.name)}</span>${example(p)}<br><span class="meta">${esc(p.tenant || "–")} · ${esc(p.address || "")}</span></span><span class="mono">${money(p.rent)}</span></a>`; }).join("")}</div></section>
+    <section class="panel"><h2>${tl("Einstellungen", "Preferences")}</h2><div class="form">
+      <label class="field"><span>${tl("Freigabegrenze für Reparaturen (€)", "Approval limit for repairs (€)")}</span><input type="number" id="set-limit" min="0" step="50" value="${esc(S.settings.limit)}"></label>
+      <label class="field"><span>${tl("Name unter E-Mails", "Name under emails")}</span><input type="text" id="set-sign" value="${esc(S.settings.signName || "")}" placeholder="Ihre Objektverwaltung"></label>
+      <label class="field wide"><span>${tl("E-Mail des Finanzteams", "Finance team email")}</span><input type="email" id="set-fin" value="${esc(S.settings.financeEmail || "")}"></label></div>
+      <p class="muted" style="font-size:13px;margin:8px 0 0">${tl("Angebote über der Grenze brauchen ein zweites Angebot. Name und Finanz-E-Mail werden in die E-Mail-Entwürfe eingesetzt.", "Quotes above the limit need a second quote. Name and finance email are used in the email drafts.")}</p></section>
+  </div>`;
 }
 
 /* ---------- Störung aufnehmen ---------- */
@@ -797,34 +1007,49 @@ function viewCall() {
   const p = S.properties[CALL.prop];
   const machines = vals("machines").filter(m => m.propertyId === CALL.prop);
   const m = S.machines[CALL.machine];
-  const cat = CATALOG[CALL.cat];
+  const cat = callCat();
+  const isOther = CALL.sym === "__other";
   const sym = cat?.sym.find(s => s.id === CALL.sym);
+  const tenantContacts = (p?.contacts || []).filter(c => c.role === "tenant");
   let h = `<div class="head"><div><div class="eyebrow">${tl("Anruf läuft", "Call in progress")}</div><h1>${tl("Störung aufnehmen", "Log a fault")}</h1></div>${CALL.prop ? `<button class="btn ghost" data-act="call-reset">${tl("Neu beginnen", "Start over")}</button>` : ""}</div><div class="steps">`;
-  h += `<section class="step"><div class="n">1 · ${tl("Welches Objekt?", "Which property?")}</div><div class="row">${props.length ? props.map(x => `<button class="chip ${CALL.prop === x.id ? "on" : ""}" data-call-prop="${x.id}">${esc(x.name)}</button>`).join("") : `<span class="muted">${tl("Noch keine Objekte.", "No properties yet.")}</span> <button class="btn sm" data-act="new-prop">${tl("Objekt anlegen", "Add property")}</button>`}</div>${p ? `<p class="muted" style="margin:8px 0 0;font-size:13px">${tl("Mieter", "Tenant")}: ${esc(p.tenant || "–")}${p.tenantContact ? " · " + esc(p.tenantContact) : ""}</p>` : ""}</section>`;
+  h += `<section class="step"><div class="n">1 · ${tl("Welches Objekt?", "Which property?")}</div><div class="row">${props.length ? props.map(x => `<button class="chip ${CALL.prop === x.id ? "on" : ""}" data-call-prop="${x.id}">${esc(x.name)}</button>`).join("") : `<span class="muted">${tl("Noch keine Objekte.", "No properties yet.")}</span> <button class="btn sm" data-act="new-prop">${tl("Objekt anlegen", "Add property")}</button>`}</div>
+    ${p ? `<p class="muted" style="margin:8px 0 0;font-size:13px">${tl("Mieter", "Tenant")}: ${esc(p.tenant || "–")}${p.tenantContact ? " · " + esc(p.tenantContact) : ""}${tenantContacts.map(c => ` · ${esc(c.name)} <span class="mono">${esc(c.phone || "")}</span>`).join("")}</p>` : ""}</section>`;
   if (CALL.prop) {
-    h += `<section class="step"><div class="n">2 · ${tl("Welche Anlage?", "Which equipment?")}</div><div class="row">${machines.map(x => `<button class="chip ${CALL.machine === x.id ? "on" : ""}" data-call-machine="${x.id}"><span class="code">${esc(catOf(x)?.code || "")}</span>${esc(machineName(x))}${x.location ? ` <span class="muted" style="font-weight:400">· ${esc(x.location)}</span>` : ""}</button>`).join("")}</div>
-      <details style="margin-top:10px" ${!machines.length ? "open" : ""}><summary class="muted">${tl("Nicht in der Liste? Anlagentyp wählen", "Not listed? Pick a type")}</summary><div class="row" style="margin-top:8px">${Object.entries(CATALOG).map(([k, c]) => `<button class="chip ${!CALL.machine && CALL.cat === k ? "on" : ""}" data-call-cat="${k}"><span class="code">${c.code}</span>${esc(tr(c.name))}</button>`).join("")}</div></details></section>`;
+    h += `<section class="step"><div class="n">2 · ${tl("Welche Anlage?", "Which equipment?")}</div><div class="row">
+      <button class="chip ${!CALL.machine && CALL.cat === "general" ? "on" : ""}" data-call-cat="general"><span class="code">GEB</span>${tl("Allgemein / Gebäude", "General / building")}</button>
+      ${machines.map(x => `<button class="chip ${CALL.machine === x.id ? "on" : ""}" data-call-machine="${x.id}"><span class="code">${esc(catOf(x)?.code || "")}</span>${esc(machineName(x))}${x.location ? ` <span class="muted" style="font-weight:400">· ${esc(x.location)}</span>` : ""}</button>`).join("")}</div>
+      <details style="margin-top:10px" ${!machines.length ? "open" : ""}><summary class="muted">${tl("Nicht in der Liste? Anlagentyp wählen", "Not listed? Pick a type")}</summary><div class="row" style="margin-top:8px">${Object.entries(CATALOG).filter(([k]) => k !== "general").map(([k, c]) => `<button class="chip ${!CALL.machine && CALL.cat === k ? "on" : ""}" data-call-cat="${k}"><span class="code">${c.code}</span>${esc(tr(c.name))}</button>`).join("")}</div></details></section>`;
   }
   if (cat) {
-    h += `<section class="step"><div class="n">3 · ${tl("Was sagt der Mieter?", "What does the tenant say?")}</div><div class="row">${cat.sym.map(s => `<button class="chip ${CALL.sym === s.id ? "on" : ""}" data-call-sym="${s.id}"><span class="sev ${s.sev}" style="padding:0;background:none"></span>${esc(tr(s.l))}</button>`).join("")}</div>
+    h += `<section class="step"><div class="n">3 · ${tl("Was ist das Problem?", "What's the problem?")}</div><div class="row">${cat.sym.map(s => `<button class="chip ${CALL.sym === s.id ? "on" : ""}" data-call-sym="${s.id}"><span class="sev ${s.sev}" style="padding:0;background:none"></span>${esc(tr(s.l))}</button>`).join("")}
+      <button class="chip ${isOther ? "on" : ""}" data-call-sym="__other">✎ ${tl("Sonstiges Problem", "Other problem")}</button></div>
+      ${isOther ? `<div style="margin-top:12px"><div class="eyebrow" style="margin-bottom:6px">${tl("Wie dringend?", "How urgent?")}</div><div class="seg">${Object.keys(SEV).map(k => `<button class="chip ${CALL.sev === k ? "on" : ""}" data-call-sev="${k}">${sevPill(k)}</button>`).join("")}</div></div>` : ""}
       <label class="field" style="margin-top:12px"><span>${tl("Notizen / genaue Worte des Mieters", "Notes / the tenant's exact words")}</span><textarea id="call-text" placeholder="${tl("z. B. „Display zeigt F28, Druck 0,8 bar, Halle B kalt“", "e.g. „display shows F28, pressure 0.8 bar, hall B cold“")}">${esc(CALL.text)}</textarea></label></section>`;
+  }
+  if (cat && isOther) {
+    h += `<section class="panel"><p style="margin:0">${tl("Beschreibe oben, was der Mieter sagt, und tippe auf „KI fragen“. Die KI schätzt ein, wie dringend es ist, was die Ursache sein kann und wen du anrufen solltest.", "Describe what the tenant says above and tap „Ask AI“. The AI estimates how urgent it is, the likely cause and who to call.")}</p></section>
+    <section class="panel"><h2>${tl("Wer muss kommen?", "Who should come?")}</h2><div class="callwho">${whoToCall(cat, m)}</div></section>`;
   }
   if (sym) {
     const sv = sym.sev;
     h += `<section class="light ${sv}"><div class="lamp" aria-hidden="true"><i class="r"></i><i class="a"></i><i class="g"></i></div><div><div class="eyebrow">${tl("Einstufung", "Severity")}</div><h2>${esc(tr(SEV[sv].label))}</h2><p style="margin:6px 0 0">${esc(tr(sym.act) || tr(SEV[sv].hint))}</p></div></section>
     <div class="grid g2">
-      <section class="panel"><h2>${tl("Diese Fragen jetzt stellen", "Ask these questions now")}</h2><ul class="qs">${sym.q.map((q, i) => `<li><label><input type="checkbox" data-q="${i}" ${CALL.checked[i] ? "checked" : ""}><span>${esc(tr(q))}</span></label></li>`).join("")}</ul></section>
-      <section class="panel"><h2>${tl("Wer muss kommen?", "Who should come?")}</h2><div class="callwho">${(() => { const cs = contractorsFor(cat.trade, m); return cs.length ? cs.slice(0, 3).map(contactCard).join("") : `<p class="muted">${tl("Kein Dienstleister für", "No contractor for")} „${esc(tr(TRADES[cat.trade]))}“ ${tl("hinterlegt.", "saved yet.")}</p><button class="btn sm" data-act="new-contr" data-trade="${cat.trade}">${tl("Dienstleister anlegen", "Add contractor")}</button>`; })()}</div></section>
+      <section class="panel"><h2>${tl("Diese Fragen jetzt stellen", "Ask these questions now")}</h2>${sym.q.length ? `<ul class="qs">${sym.q.map((q, i) => `<li><label><input type="checkbox" data-q="${i}" ${CALL.checked[i] ? "checked" : ""}><span>${esc(tr(q))}</span></label></li>`).join("")}</ul>` : `<p class="muted">–</p>`}</section>
+      <section class="panel"><h2>${tl("Wer muss kommen?", "Who should come?")}</h2><div class="callwho">${whoToCall(cat, m)}</div></section>
     </div>
     <section class="panel"><h2>${tl("Mögliche Ursachen", "Likely causes")}</h2><div>${[...sym.c].sort((a, b) => b.p - a.p).map(c => `<div class="cause"><div>${meter(c.p)}</div><div><div style="font-weight:700">${esc(tr(c.t))} <span class="cost">${costSigns(c.k)}</span></div><div class="muted" style="font-size:14px">${esc(tr(c.w))}</div></div></div>`).join("")}</div>
       <p class="muted" style="font-size:12px;margin:10px 0 0">${tl("Balken = wie wahrscheinlich · € = grobe Kostenklasse. Eine Ferndiagnose ersetzt keinen Techniker.", "Bars = how likely · € = rough cost class. A remote guess does not replace a technician.")}</p></section>`;
   }
-  if (cat || CALL.text) h += aiDiagnosisBlock();
+  if (cat) h += aiDiagnosisBlock();
   if (cat && CALL.prop) h += `<div class="row"><button class="btn primary" data-act="call-ticket">${tl("Reparatur-Ticket anlegen", "Create repair ticket")}</button><span class="muted" style="font-size:13px">${tl("Speichert Objekt, Anlage, Einstufung und deine Notizen.", "Saves property, equipment, severity and your notes.")}</span></div>`;
   return h + `</div>`;
 }
+function whoToCall(cat, m) {
+  const cs = contractorsFor(cat.trade, m);
+  return cs.length ? cs.slice(0, 3).map(contactCard).join("") : `<p class="muted">${tl("Kein Dienstleister für", "No contractor for")} „${esc(tr(TRADES[cat.trade]))}“ ${tl("hinterlegt.", "saved yet.")}</p><button class="btn sm" data-act="new-contr" data-trade="${cat.trade}">${tl("Dienstleister anlegen", "Add contractor")}</button>`;
+}
 function aiDiagnosisBlock() {
-  if (!sample) return `<section class="panel muted" style="font-size:14px">${tl("KI-Diagnose ist in dieser Ansicht nicht verfügbar. Die Diagnose aus dem Anlagen-Wissen oben funktioniert trotzdem.", "AI diagnosis isn't available in this view. The guide-based diagnosis above still works.")}</section>`;
+  if (!sample) return `<section class="panel muted" style="font-size:14px">${tl("KI-Diagnose ist in dieser Ansicht nicht verfügbar.", "AI diagnosis isn't available in this view.")}</section>`;
   const a = CALL.ai;
   return `<section class="ai"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">${tl("KI-Diagnose", "AI diagnosis")}</div><h3>${tl("Aus den genauen Worten des Mieters", "From the tenant's exact words")}</h3></div>
     <button class="btn primary sm" data-act="call-ai" ${CALL.busy ? "disabled" : ""}>${CALL.busy ? `<span class="spin"></span> ${tl("Denkt nach…", "Thinking…")}` : tl("KI fragen", "Ask AI")}</button></div>
@@ -857,7 +1082,12 @@ function viewProperty(id) {
   const ms = vals("machines").filter(m => m.propertyId === id);
   const ts = vals("tickets").filter(t => t.propertyId === id).sort((a, b) => (b.created || "").localeCompare(a.created || ""));
   const is = vals("inspections").filter(i => i.propertyId === id).sort((a, b) => (a.next || "").localeCompare(b.next || ""));
-  const costYear = ts.filter(t => (t.created || "").startsWith(new Date().getFullYear().toString())).reduce((s, t) => s + (Number(t.cost) || 0), 0);
+  const rs = vals("reminders").filter(r => r.propertyId === id).sort((a, b) => (a.done - b.done) || (a.at || "").localeCompare(b.at || ""));
+  const yr = String(new Date().getFullYear());
+  const costYear = ts.filter(t => (t.created || "").startsWith(yr)).reduce((s, t) => s + (Number(t.cost) || 0), 0);
+  const b = p.building || {};
+  const groups = BUILDING_GROUPS.map(g => ({ t: g.t, f: g.f.filter(([k]) => b[k]) })).filter(g => g.f.length);
+  const contacts = p.contacts || [];
   return `<div class="head"><div><div class="eyebrow"><a href="#objects">${tl("Objekte", "Properties")}</a> / ${esc(p.type || "")}</div><h1>${esc(p.name)}${example(p)}</h1><div class="muted">${esc(p.address || "")}</div></div>
     <div class="row"><button class="btn" data-act="edit-prop" data-id="${id}">${tl("Bearbeiten", "Edit")}</button><button class="btn primary" data-act="new-machine" data-prop="${id}">${tl("Anlage hinzufügen", "Add equipment")}</button></div></div>
   <div class="stats">
@@ -866,12 +1096,22 @@ function viewProperty(id) {
     <div class="stat"><span class="eyebrow">${tl("Reparaturen dieses Jahr", "Repairs this year")}</span><b>${money(costYear)}</b><span class="sub">${ts.length} ${tl("Tickets gesamt", "tickets total")}</span></div>
     <div class="stat"><span class="eyebrow">${tl("Fläche", "Area")}</span><b>${p.area ? esc(p.area) + " m²" : "–"}</b><span class="sub">${ms.length} ${tl("Anlagen", "units")}</span></div>
   </div>
+  <div class="grid g2" style="margin-bottom:14px">
+    <section class="panel"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2>${tl("Erinnerungen", "Reminders")}</h2><button class="btn sm" data-act="new-rem" data-prop="${id}">${tl("+ Erinnerung", "+ Reminder")}</button></div>
+      ${rs.length ? rs.map(r => remRow(r)).join("") : `<p class="muted" style="margin:0">${tl("Keine Erinnerungen.", "No reminders.")}</p>`}</section>
+    <section class="panel"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2>${tl("Kontakte", "Contacts")}</h2><button class="btn sm" data-act="new-contact" data-prop="${id}">${tl("+ Kontakt", "+ Contact")}</button></div>
+      ${contacts.length ? `<div class="callwho">${contacts.map(c => `<div class="contact"><div><div style="font-weight:700">${esc(c.name)}</div><div class="muted" style="font-size:13px">${esc(tr(CONTACT_ROLES[c.role]) || "")}${c.email ? ` · <span style="user-select:all">${esc(c.email)}</span>` : ""}</div></div><div class="row"><span class="phone">${esc(c.phone || "–")}</span>${copyBtn(c.phone)}<button class="btn sm ghost" data-act="edit-contact" data-prop="${id}" data-cid="${c.id}">${tl("Bearbeiten", "Edit")}</button></div></div>`).join("")}</div>` : `<p class="muted" style="margin:0">${tl("Mieter-Ansprechpartner, Hausmeister, Eigentümer …", "Tenant contacts, caretaker, owner …")}</p>`}</section>
+  </div>
+  <section class="panel" style="margin-bottom:22px"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2>${tl("Gebäudedaten", "Building details")}</h2><button class="btn sm" data-act="edit-building" data-id="${id}">${groups.length ? tl("Bearbeiten", "Edit") : tl("Ergänzen", "Add details")}</button></div>
+    ${groups.length ? `<div class="grid g2" style="gap:18px">${groups.map(g => `<div><div class="eyebrow" style="margin-bottom:6px">${esc(tr(g.t))}</div><dl class="kv">${g.f.map(([k, l]) => `<dt>${esc(tr(l))}</dt><dd>${esc(b[k])}</dd>`).join("")}</dl></div>`).join("")}</div>`
+      : `<p class="muted" style="margin:0">${tl("Wo sind Hauptabsperrhahn, Gashahn und Sicherungen? Zählernummern, Schlüssel, Störungsnummern der Versorger. Alles, was du bei einem Anruf schnell brauchst.", "Where are the main water valve, gas valve and fuses? Meter numbers, keys, utility fault lines. Everything you need fast on a call.")}</p>`}</section>
   ${p.photoId ? `<img class="thumb" style="max-height:260px;margin-bottom:18px" src="${blob(p.photoId)}" alt="">` : ""}
-  <section style="margin-bottom:22px"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2>${tl("Anlagen", "Equipment")}</h2></div>
+  <section style="margin-bottom:22px"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2>${tl("Anlagen", "Equipment")}</h2>
+      ${sample && imgOK ? `<label class="btn sm" style="cursor:pointer">${UI.busy.scan ? `<span class="spin"></span> ${tl("Erkenne…", "Identifying…")}` : tl("Unbekannte Anlage per Foto erkennen", "Identify unknown equipment by photo")}<input type="file" accept="image/*" data-scan="${id}" hidden></label>` : ""}</div>
     ${ms.length ? `<div class="grid g3">${ms.map(plateCard).join("")}</div>` : `<div class="empty"><b>${tl("Noch keine Anlagen", "No equipment yet")}</b>${tl("Füge Heizung, Tore, Brandmeldeanlage usw. hinzu.", "Add heating, doors, fire alarm etc.")}</div>`}</section>
   <div class="grid g2">
     <section class="panel"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2>${tl("Prüfungen", "Inspections")}</h2>${ms.length ? `<button class="btn sm" data-act="suggest-insp" data-prop="${id}">${tl("Pflichtprüfungen vorschlagen", "Suggest required checks")}</button>` : ""}</div>${is.length ? `<div class="list">${is.map(inspRow).join("")}</div>` : `<p class="muted">${tl("Noch keine Prüfungen.", "No inspections yet.")}</p>`}</section>
-    <section class="panel"><h2>${tl("Reparaturen", "Repairs")}</h2>${ts.length ? `<div class="list">${ts.map(ticketRow).join("")}</div>` : `<p class="muted">${tl("Noch keine Reparaturen.", "No repairs yet.")}</p>`}</section>
+    <section class="panel"><h2>${tl("Alle gemeldeten Störungen", "All reported issues")}</h2>${ts.length ? `<div class="list">${ts.map(ticketRow).join("")}</div>` : `<p class="muted">${tl("Noch keine Störungen.", "No issues yet.")}</p>`}</section>
   </div>
   ${p.notes ? `<section class="panel" style="margin-top:14px"><h2>${tl("Notizen", "Notes")}</h2><p class="prose" style="white-space:pre-wrap;margin:0">${esc(p.notes)}</p></section>` : ""}`;
 }
@@ -879,7 +1119,7 @@ function plateCard(m) {
   const c = catOf(m);
   return `<a class="plate" href="#m-${m.id}">
     <div class="p-top"><span class="p-code">${esc(c?.code || "ANL")}</span><span class="tag">${esc(m.location || "")}</span></div>
-    <div class="p-name">${esc(machineName(m))}${example(m)}</div>
+    <div class="p-name">${m._busy ? `<span class="spin"></span> ` : ""}${esc(machineName(m))}${example(m)}</div>
     <dl><dt>${tl("Hersteller", "Make")}</dt><dd>${esc(m.brand || "–")}</dd><dt>${tl("Modell", "Model")}</dt><dd>${esc(m.model || "–")}</dd><dt>${tl("Baujahr", "Year")}</dt><dd>${esc(m.year || "–")}</dd></dl></a>`;
 }
 
@@ -894,7 +1134,7 @@ function viewMachine(id) {
   const contr = contractorsFor(c?.trade, m);
   const info = m.aiInfo;
   const age = m.year ? new Date().getFullYear() - Number(m.year) : null;
-  return `<div class="head"><div><div class="eyebrow"><a href="#p-${m.propertyId}">${esc(propName(m.propertyId))}</a> / ${esc(c?.code || "")}</div><h1>${esc(machineName(m))}${example(m)}</h1><div class="muted">${esc(m.location || "")}</div></div>
+  return `<div class="head"><div><div class="eyebrow"><a href="#p-${m.propertyId}">${esc(propName(m.propertyId))}</a> / ${esc(c?.code || "")}</div><h1>${m._busy ? `<span class="spin"></span> ` : ""}${esc(machineName(m))}${example(m)}</h1><div class="muted">${esc(m.location || "")}</div></div>
     <div class="row"><button class="btn" data-act="edit-machine" data-id="${id}">${tl("Bearbeiten", "Edit")}</button><a class="btn primary" href="#call" data-act="call-from-machine" data-id="${id}">${tl("Störung melden", "Report fault")}</a></div></div>
   <div class="grid g2" style="margin-bottom:14px">
     <div class="plate" style="padding-bottom:18px">
@@ -907,8 +1147,8 @@ function viewMachine(id) {
         <dt>${tl("Leistung", "Rating")}</dt><dd>${esc(m.power || "–")}</dd>
         <dt>${tl("Letzte Wartung", "Last service")}</dt><dd>${fmtDate(m.lastService)}</dd>
       </dl>
-      ${sample && imgOK ? `<div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px"><label class="btn sm primary" style="cursor:pointer">${m._busy ? `<span class="spin"></span> ${tl("Liest Typenschild…", "Reading plate…")}` : tl("Typenschild-Foto hochladen", "Upload type plate photo")}<input type="file" accept="image/*" data-plate="${id}" hidden></label>
-        <p class="muted" style="font-size:12px;margin:6px 0 0">${tl("Die KI liest Hersteller, Modell und Baujahr und erklärt das Gerät.", "AI reads make, model and year, and explains the unit.")}</p></div>` : ""}
+      ${sample && imgOK ? `<div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px"><label class="btn sm primary" style="cursor:pointer">${m._busy ? `<span class="spin"></span> ${tl("Liest Foto…", "Reading photo…")}` : tl("Foto von Typenschild oder Anlage hochladen", "Upload photo of plate or unit")}<input type="file" accept="image/*" data-plate="${id}" hidden></label>
+        <p class="muted" style="font-size:12px;margin:6px 0 0">${tl("Die KI erkennt die Anlage, liest Hersteller, Modell und Baujahr und erklärt sie. Stimmt der Typ nicht, wird er korrigiert.", "The AI identifies the unit, reads make, model and year and explains it. If the type is wrong, it gets corrected.")}</p></div>` : ""}
     </div>
     <div class="grid" style="gap:14px">
       ${m.photoId ? `<img class="thumb" src="${blob(m.photoId)}" alt="">` : assets ? `<label class="ph" style="cursor:pointer">${tl("+ Foto der Anlage hinzufügen", "+ Add a photo of the unit")}<input type="file" accept="image/*" data-photo-m="${id}" hidden></label>` : ""}
@@ -921,8 +1161,8 @@ function viewMachine(id) {
         ${info.commonFaults?.length ? `<p class="eyebrow" style="margin-top:10px">${tl("Typische Fehler", "Common faults")}</p>${info.commonFaults.map(f => `<div class="cause" style="grid-template-columns:1fr"><div><b>${esc(f.title)}</b><div class="muted" style="font-size:14px">${esc(f.explanation)}</div></div></div>`).join("")}` : ""}
         ${info.maintenance ? `<p style="margin:8px 0 0"><b>${tl("Wartung", "Maintenance")}:</b> ${esc(info.maintenance)}</p>` : ""}
         ${info.warning ? `<p style="margin:8px 0 0"><b>${tl("Achtung", "Caution")}:</b> ${esc(info.warning)}</p>` : ""}</div>` : ""}
-      ${sample && (m.brand || m.model) ? `<button class="btn sm" style="margin-top:12px" data-act="machine-ai" data-id="${id}" ${m._busy ? "disabled" : ""}>${m._busy ? `<span class="spin"></span>` : ""} ${info ? tl("KI-Infos aktualisieren", "Refresh AI info") : tl("KI-Infos zu diesem Modell", "AI info for this model")}</button>` : ""}
-      ${c ? `<details style="margin-top:14px"><summary>${tl("Typische Störungen dieses Anlagentyps", "Typical faults for this type")}</summary><ul style="margin:8px 0 0">${c.sym.map(s => `<li>${sevPill(s.sev)} ${esc(tr(s.l))}</li>`).join("")}</ul></details>` : ""}</section>
+      ${sample && (m.brand || m.model) ? `<button class="btn sm" style="margin-top:12px" data-act="machine-ai" data-id="${id}" ${m._busy ? "disabled" : ""}>${info ? tl("KI-Infos aktualisieren", "Refresh AI info") : tl("KI-Infos zu diesem Modell", "AI info for this model")}</button>` : ""}
+      ${c && c.sym.length ? `<details style="margin-top:14px" open><summary>${tl("Was kann kaputtgehen?", "What can go wrong?")}</summary>${c.sym.map(s => `<details style="border-top:1px solid var(--line);padding:8px 0;margin-top:6px"><summary>${sevPill(s.sev)} ${esc(tr(s.l))}</summary><p style="margin:6px 0;font-size:14px">${esc(tr(s.act))}</p>${[...s.c].sort((a, b) => b.p - a.p).map(x => `<div class="cause"><div>${meter(x.p)}</div><div><b>${esc(tr(x.t))}</b> <span class="cost">${costSigns(x.k)}</span><div class="muted" style="font-size:14px">${esc(tr(x.w))}</div></div></div>`).join("")}</details>`).join("")}</details>` : ""}</section>
     <section class="panel"><h2>${tl("Zuständig für Reparatur", "Who repairs it")}</h2><div class="callwho">${contr.length ? contr.slice(0, 3).map(contactCard).join("") : `<p class="muted">${tl("Noch kein Dienstleister hinterlegt.", "No contractor saved yet.")}</p>`}</div>
       ${m.contract ? `<p style="font-size:14px;margin:10px 0 0"><b>${tl("Wartungsvertrag", "Service contract")}:</b> ${esc(m.contract)}</p>` : ""}
       ${m.warrantyUntil ? `<p style="font-size:14px;margin:6px 0 0"><b>${tl("Gewährleistung bis", "Warranty until")}:</b> ${fmtDate(m.warrantyUntil)} ${daysUntil(m.warrantyUntil) >= 0 ? `<span class="sev green">${tl("aktiv", "active")}</span>` : ""}</p>` : ""}</section>
@@ -934,7 +1174,7 @@ function viewMachine(id) {
       ${(m.docs || []).length ? `<div class="list">${m.docs.map(d => `<a class="item" href="${blob(d.id)}" target="_blank" rel="noopener"><span class="bar"></span><span class="ttl">${esc(d.name)}</span><span class="tag">${esc((d.name.split(".").pop() || "").toUpperCase())}</span></a>`).join("")}</div>` : `<p class="muted">${tl("Bedienungsanleitung, Wartungsvertrag, Prüfbericht …", "Manual, service contract, inspection report …")}</p>`}
       ${assets ? `<label class="btn sm" style="cursor:pointer;margin-top:10px">${tl("Dokument hochladen", "Upload document")}<input type="file" accept="application/pdf,image/*" data-doc="${id}" hidden></label>` : ""}</section>
     <section class="panel"><h2>${tl("QR-Etikett", "QR sticker")}</h2>
-      <div class="row" style="align-items:flex-start;gap:16px"><div class="qr" id="qr"></div><div style="flex:1;min-width:180px;font-size:14px"><p style="margin:0 0 8px">${tl("Auf die Anlage kleben. Beim Scannen öffnet sich diese Seite mit allen Daten.", "Stick it on the unit. Scanning opens this page with all its details.")}</p><p class="muted" style="font-size:12px;margin:0 0 10px">${tl("Nur für Personen mit Zugriff auf die App. Ein Meldeformular für Mieter kann später ergänzt werden.", "Only for people with access to the app. A reporting form for tenants can be added later.")}</p>${downloads ? `<button class="btn sm" data-act="qr-save" data-id="${id}">${tl("Als Bild speichern", "Save as image")}</button>` : ""}</div></div></section>
+      <div class="row" style="align-items:flex-start;gap:16px"><div class="qr" id="qr"></div><div style="flex:1;min-width:180px;font-size:14px"><p style="margin:0 0 8px">${tl("Auf die Anlage kleben. Beim Scannen öffnet sich diese Seite.", "Stick it on the unit. Scanning opens this page.")}</p><p class="muted" style="font-size:12px;margin:0 0 10px">${tl("Nur für Personen mit Zugriff auf die App.", "Only for people with access to the app.")}</p>${downloads ? `<button class="btn sm" data-act="qr-save" data-id="${id}">${tl("Als Bild speichern", "Save as image")}</button>` : ""}</div></div></section>
   </div>
   ${m.notes ? `<section class="panel" style="margin-top:14px"><h2>${tl("Notizen", "Notes")}</h2><p style="white-space:pre-wrap;margin:0">${esc(m.notes)}</p></section>` : ""}`;
 }
@@ -942,50 +1182,157 @@ function viewMachine(id) {
 /* ---------- Reparaturen ---------- */
 function viewTickets() {
   const all = vals("tickets").sort((a, b) => (b.created || "").localeCompare(a.created || ""));
-  const list = ticketFilter === "all" ? all : ticketFilter === "done" ? all.filter(t => t.status === "done") : all.filter(t => t.status !== "done");
+  const f = UI.ticketFilter;
+  const list = f === "all" ? all : f === "done" ? all.filter(t => t.status === "done") : all.filter(t => t.status !== "done");
   return `<div class="head"><div><div class="eyebrow">${all.length} ${tl("Tickets", "tickets")}</div><h1>${tl("Reparaturen", "Repairs")}</h1></div><a class="btn primary" href="#call">${tl("Störung aufnehmen", "Log a fault")}</a></div>
-  <div class="tabs">${[["open", tl("Offen", "Open")], ["done", tl("Erledigt", "Done")], ["all", tl("Alle", "All")]].map(([k, l]) => `<button class="${ticketFilter === k ? "on" : ""}" data-tfilter="${k}">${l}</button>`).join("")}</div>
+  <div class="tabs">${[["open", tl("Offen", "Open")], ["done", tl("Erledigt", "Done")], ["all", tl("Alle", "All")]].map(([k, l]) => `<button class="${f === k ? "on" : ""}" data-tfilter="${k}">${l}</button>`).join("")}</div>
   ${list.length ? `<div class="panel"><div class="list">${list.map(ticketRow).join("")}</div></div>` : `<div class="empty"><b>${tl("Keine Tickets", "No tickets")}</b>${tl("Neue Störungen legst du über „Störung aufnehmen“ an.", "Create new ones via „Log a fault“.")}</div>`}`;
 }
 
-function ticketModal(id) {
-  const t = S.tickets[id]; if (!t) return;
-  const m = S.machines[t.machineId];
-  const c = CATALOG[t.cat] || catOf(m);
+function ticketLog(t) {
+  const log = [...(t.log || [])];
+  if (!log.find(e => e.type === "created")) log.unshift({ at: (t.created || today()) + "T08:00", type: "created", note: "" });
+  return log.sort((a, b) => (b.at || "").localeCompare(a.at || ""));
+}
+function viewTicket(id) {
+  const t = S.tickets[id];
+  if (!t) return `<div class="empty"><b>${tl("Ticket nicht gefunden", "Ticket not found")}</b><a href="#tickets">${tl("Zur Liste", "Back to list")}</a></div>`;
+  const m = S.machines[t.machineId]; const p = S.properties[t.propertyId]; const c = ticketCat(t);
   const lim = Number(S.settings.limit) || 0;
-  const qA = Number(t.quoteA) || 0, qB = Number(t.quoteB) || 0;
+  const qA = Number(t.quoteA) || 0, qB = Number(t.quoteB) || 0, cost = Number(t.cost) || 0;
   const hist = vals("tickets").filter(x => x.id !== id && x.cat === t.cat && Number(x.cost) > 0);
   const avg = hist.length ? hist.reduce((s, x) => s + Number(x.cost), 0) / hist.length : 0;
   let check = "";
   const maxQ = Math.max(qA, qB);
   if (qA && !qB && qA > lim) check = `<div class="check warn"><b>${tl("Über deiner Freigabegrenze", "Above your approval limit")} (${money(lim)}).</b> ${tl("Hol ein zweites Angebot ein, bevor du beauftragst.", "Get a second quote before you approve.")}</div>`;
-  else if (qA && qB) { const lo = Math.min(qA, qB), hi = Math.max(qA, qB); check = `<div class="check ${hi - lo > lo * 0.15 ? "warn" : "ok"}">${tl("Günstiger", "Cheaper")}: <b>${esc(qA <= qB ? (t.quoteAFrom || "A") : (t.quoteBFrom || "B"))}</b> ${tl("mit", "at")} <b class="mono">${money(lo)}</b>. ${tl("Unterschied", "Difference")}: <span class="mono">${money(hi - lo)}</span> (${Math.round((hi - lo) / lo * 100)} %).</div>`; }
+  else if (qA && qB) { const lo = Math.min(qA, qB), hi = Math.max(qA, qB); check = `<div class="check ${hi - lo > lo * 0.15 ? "warn" : "ok"}">${tl("Günstiger", "Cheaper")}: <b>${esc(qA <= qB ? (t.quoteAFrom || "1") : (t.quoteBFrom || "2"))}</b> ${tl("mit", "at")} <b class="mono">${money(lo)}</b>. ${tl("Unterschied", "Difference")}: <span class="mono">${money(hi - lo)}</span> (${Math.round((hi - lo) / lo * 100)} %).</div>`; }
   else if (qA) check = `<div class="check ok">${tl("Innerhalb deiner Freigabegrenze.", "Within your approval limit.")}</div>`;
   if (avg && maxQ) check += `<div class="check ${maxQ > avg * 1.3 ? "bad" : "ok"}" style="margin-top:8px">${tl("Bisher bezahlt für ähnliche Reparaturen", "Paid before for similar repairs")}: <b class="mono">${money(avg)}</b> ${tl("im Schnitt", "on average")} (${hist.length}×).${maxQ > avg * 1.3 ? " " + tl("Dieses Angebot liegt deutlich darüber.", "This quote is clearly higher.") : ""}</div>`;
+  const lowQ = [qA, qB].filter(Boolean).sort((a, b) => a - b)[0];
+  const invCheck = cost && lowQ ? (cost > lowQ * 1.05 ? `<div class="check bad">${tl("Rechnung liegt", "Invoice is")} <b class="mono">${money(cost - lowQ)}</b> ${tl("über dem Angebot. Nachfragen, bevor bezahlt wird.", "above the quote. Ask before it gets paid.")}</div>` : `<div class="check ok">${tl("Rechnung passt zum Angebot.", "Invoice matches the quote.")}</div>`) : "";
   const neg = t.negotiation;
-  const contrOpts = vals("contractors").map(x => `<option value="${x.id}" ${t.contractorId === x.id ? "selected" : ""}>${esc(x.name)} · ${esc(tr(TRADES[x.trade]))}</option>`).join("");
-  openModal(`<div class="mhead"><div><div class="eyebrow">${esc(propName(t.propertyId))}${m ? " · " + esc(machineName(m)) : ""}</div><h2>${esc(t.title)}</h2></div><button class="btn ghost sm" data-close>${tl("Schließen", "Close")}</button></div>
-  <div class="row" style="margin-bottom:12px">${sevPill(t.severity)} <span class="muted" style="font-size:13px">${tl("Angelegt", "Created")} ${fmtDate(t.created)}</span></div>
-  ${t.notes ? `<p style="white-space:pre-wrap;margin:0 0 12px" class="prose">${esc(t.notes)}</p>` : ""}
-  ${t.ai?.summary ? `<div class="ai" style="margin-bottom:12px;font-size:14px"><div class="eyebrow">${tl("KI-Einschätzung", "AI assessment")}</div>${esc(t.ai.summary)}</div>` : ""}
-  <form id="tform" class="form">
-    <label class="field"><span>Status</span><select id="t-status">${Object.entries(STATUS).map(([k, v]) => `<option value="${k}" ${t.status === k ? "selected" : ""}>${esc(tr(v))}</option>`).join("")}</select></label>
-    <label class="field"><span>${tl("Einstufung", "Severity")}</span><select id="t-sev">${Object.keys(SEV).map(k => `<option value="${k}" ${t.severity === k ? "selected" : ""}>${esc(tr(SEV[k].label))}</option>`).join("")}</select></label>
-    <label class="field wide"><span>${tl("Beauftragter Dienstleister", "Assigned contractor")}</span><select id="t-contr"><option value="">–</option>${contrOpts}</select></label>
-    <label class="field"><span>${tl("Angebot 1 (€)", "Quote 1 (€)")}</span><input type="number" id="t-qa" min="0" value="${esc(t.quoteA || "")}"></label>
-    <label class="field"><span>${tl("von", "from")}</span><input type="text" id="t-qaf" value="${esc(t.quoteAFrom || "")}"></label>
-    <label class="field"><span>${tl("Angebot 2 (€)", "Quote 2 (€)")}</span><input type="number" id="t-qb" min="0" value="${esc(t.quoteB || "")}"></label>
-    <label class="field"><span>${tl("von", "from")}</span><input type="text" id="t-qbf" value="${esc(t.quoteBFrom || "")}"></label>
-    <div class="wide">${check}</div>
-    <label class="field"><span>${tl("Endgültige Kosten (€)", "Final cost (€)")}</span><input type="number" id="t-cost" min="0" value="${esc(t.cost || "")}"></label>
-    <label class="field wide"><span>${tl("Notizen", "Notes")}</span><textarea id="t-notes">${esc(t.notes || "")}</textarea></label>
-  </form>
-  ${sample && (qA || qB) ? `<div class="ai" style="margin-top:14px"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">${tl("Verhandlungshilfe", "Negotiation helper")}</div><h3>${tl("Argumente + E-Mail an den Dienstleister", "Arguments + email to the contractor")}</h3></div><button class="btn sm primary" data-act="negotiate" data-id="${id}" ${t._busy ? "disabled" : ""}>${t._busy ? `<span class="spin"></span>` : tl("Erstellen", "Create")}</button></div>
-    ${neg ? `<ul style="margin:10px 0">${(neg.arguments || []).map(a => `<li>${esc(a)}</li>`).join("")}</ul><p class="eyebrow">${tl("E-Mail (Deutsch)", "Email (German)")}</p><div class="panel" style="white-space:pre-wrap;font-size:14px" id="neg-mail"><b>${esc(neg.subject || "")}</b>\n\n${esc(neg.body || "")}</div><button class="btn sm" style="margin-top:8px" data-copy-el="neg-mail">${tl("E-Mail kopieren", "Copy email")}</button>${neg.bodyEn ? `<details style="margin-top:8px"><summary class="muted">${tl("Übersetzung", "Translation")}</summary><p style="white-space:pre-wrap;font-size:14px">${esc(neg.bodyEn)}</p></details>` : ""}` : ""}</div>` : ""}
-  <div class="row" style="justify-content:space-between;margin-top:16px"><button class="btn danger sm" data-act="del-ticket" data-id="${id}">${tl("Ticket löschen", "Delete ticket")}</button><button class="btn primary" data-act="save-ticket" data-id="${id}">${tl("Speichern", "Save")}</button></div>`);
+  const sel = (f, opts) => `<select data-tf="${f}" id="tf-${f}">${opts.map(([v, l]) => `<option value="${esc(v)}" ${String(t[f] ?? "") === String(v) ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>`;
+  const inp = (f, type = "text", extra = "") => `<input type="${type}" data-tf="${f}" id="tf-${f}" value="${esc(t[f] ?? "")}" ${extra}>`;
+  const contrOpts = [["", "–"], ...vals("contractors").map(x => [x.id, x.name + " · " + tr(TRADES[x.trade])])];
+  const log = ticketLog(t);
+  const mail = mailDraft(UI.mailKind, t);
+  const brief = briefing(t);
+  return `<div class="head"><div><div class="eyebrow"><a href="#p-${t.propertyId}">${esc(propName(t.propertyId))}</a>${m ? ` / <a href="#m-${m.id}">${esc(machineName(m))}</a>` : ""}</div><h1>${esc(t.title)}${example(t)}</h1>
+    <div class="row" style="margin-top:8px">${sevPill(t.severity)}<span class="tag">${esc(tr(STATUS[t.status] || STATUS.open))}</span><span class="muted" style="font-size:13px">${tl("Gemeldet", "Reported")} ${fmtDate(t.created)}${t.doneAt ? " · " + tl("erledigt ", "done ") + fmtDT(t.doneAt) : ""}</span></div></div>
+    <div class="row">${t.status !== "done" ? `<button class="btn primary" data-act="close-ticket" data-id="${id}">✓ ${tl("Als erledigt abschließen", "Mark as done")}</button>` : `<button class="btn" data-act="reopen-ticket" data-id="${id}">${tl("Wieder öffnen", "Reopen")}</button>`}</div></div>
+  ${t.ai?.summary ? `<div class="ai" style="margin-bottom:14px;font-size:14px"><div class="eyebrow">${tl("KI-Einschätzung beim Anruf", "AI assessment from the call")}</div>${esc(t.ai.summary)}</div>` : ""}
+  <div class="grid g2" style="margin-bottom:14px">
+    <section class="panel"><h2>${tl("Details", "Details")}</h2><div class="form">
+      <label class="field"><span>Status</span>${sel("status", Object.entries(STATUS).map(([k, v]) => [k, tr(v)]))}</label>
+      <label class="field"><span>${tl("Einstufung", "Severity")}</span>${sel("severity", Object.keys(SEV).map(k => [k, tr(SEV[k].label)]))}</label>
+      <label class="field wide"><span>${tl("Beauftragter Dienstleister", "Assigned contractor")}</span>${sel("contractorId", contrOpts)}</label>
+      <label class="field"><span>${tl("Termin Techniker", "Technician appointment")}</span>${inp("appointment", "datetime-local")}</label>
+      <label class="field"><span>${tl("Wer zahlt?", "Who pays?")}</span>${sel("payer", [["", "–"], ...Object.entries(PAYERS).map(([k, v]) => [k, tr(v)])])}</label>
+      <label class="field wide"><span>${tl("Beschreibung / Notizen", "Description / notes")}</span><textarea data-tf="notes" id="tf-notes">${esc(t.notes || "")}</textarea></label>
+    </div><p class="muted" style="font-size:12px;margin:8px 0 0">${tl("Änderungen werden automatisch gespeichert.", "Changes save automatically.")}</p></section>
+    <section class="panel"><h2>${tl("Verlauf", "Timeline")}</h2>
+      <input type="text" id="log-note" placeholder="${tl("Kurze Notiz (optional), z. B. „kommt Do. 8 Uhr“", "Short note (optional), e.g. „coming Thu 8am“")}">
+      <div class="qlog">${QUICK_LOG.map(k => `<button class="btn sm" data-log="${k}" data-id="${id}">${LOG_TYPES[k].i} ${esc(tr(LOG_TYPES[k].l))}</button>`).join("")}<button class="btn sm" data-log="note" data-id="${id}">✎ ${tl("Nur Notiz", "Note only")}</button></div>
+      <ul class="timeline">${log.map(e => `<li class="tl ${e.type === "done" ? "done" : ""}"><span class="ic">${LOG_TYPES[e.type]?.i || "•"}</span><div><div style="font-weight:700;font-size:14px">${esc(tr(LOG_TYPES[e.type]?.l) || e.type)}</div><div class="when">${fmtDT(e.at)}</div>${e.note ? `<div style="font-size:14px">${esc(e.note)}</div>` : ""}</div></li>`).join("")}</ul></section>
+  </div>
+  <section class="panel" style="margin-bottom:14px"><h2>${tl("Gespräch mit dem Dienstleister", "Talking to the contractor")}</h2>
+    <div class="grid g2" style="gap:18px">
+      <div><div class="eyebrow" style="margin-bottom:6px">${tl("Das kannst du sagen", "What you can say")}</div><div class="say">${esc(brief.de)}<div class="en">${esc(brief.en)}</div></div><div style="margin-top:8px">${copyBtn(brief.de)}</div>
+        <div class="eyebrow" style="margin:16px 0 6px">${tl("Diese Fragen stellen", "Ask these questions")}</div><ul class="qs">${CONTRACTOR_QS.map(q => `<li><span><b>${esc(q.de)}</b><br><span class="muted" style="font-size:13px">${esc(q.en)}</span></span></li>`).join("")}</ul></div>
+      <div><div class="eyebrow" style="margin-bottom:6px">${tl("Begriffe, die du hören könntest", "Words you may hear")}</div>${brief.terms.length ? `<dl class="kv">${brief.terms.map(g => `<dt><b>${esc(g[0])}</b></dt><dd>${esc(g[1])} – ${esc(lang === "en" ? g[3] : g[2])}</dd>`).join("")}</dl>` : `<p class="muted">–</p>`}
+        <div class="eyebrow" style="margin:16px 0 6px">${tl("Was hat er gesagt?", "What did they say?")}</div><textarea id="brief-answer" placeholder="${tl("z. B. „Kommt morgen 10 Uhr, ca. 300 €, Anfahrt 45 € extra“", "e.g. „Coming tomorrow 10am, about €300, call-out €45 extra“")}"></textarea>
+        <button class="btn sm primary" style="margin-top:8px" data-act="log-answer" data-id="${id}">${tl("Als Anruf im Verlauf speichern", "Save as call in timeline")}</button></div>
+    </div></section>
+  <section class="panel" style="margin-bottom:14px"><h2>${tl("E-Mail-Entwürfe", "Email drafts")}</h2>
+    <div class="tabs">${MAIL_KINDS.map(([k, l]) => `<button class="${UI.mailKind === k ? "on" : ""}" data-mail="${k}">${esc(tr(l))}</button>`).join("")}</div>
+    <dl class="kv" style="margin-bottom:10px"><dt>${tl("An", "To")}</dt><dd>${mail.to ? `<span class="mono" style="user-select:all">${esc(mail.to)}</span>` : `<span class="muted">${esc(mail.toHint)}</span>`}</dd><dt>${tl("Betreff", "Subject")}</dt><dd><b>${esc(mail.subject)}</b></dd></dl>
+    <div class="mail" id="mail-body">${esc(mail.body)}</div>
+    ${lang === "en" ? `<details style="margin-top:8px"><summary class="muted">English translation</summary><div class="mail" style="margin-top:6px">${esc(mail.en)}</div></details>` : ""}
+    <div class="row" style="margin-top:10px">${copyBtn(mail.subject).replace(tl("Kopieren", "Copy"), tl("Betreff kopieren", "Copy subject"))}<button class="btn sm" data-copy-el="mail-body">${tl("Text kopieren", "Copy text")}</button><button class="btn sm primary" data-act="mail-sent" data-id="${id}">✉ ${tl("Als gesendet markieren", "Mark as sent")}</button></div></section>
+  <div class="grid g2">
+    <section class="panel"><h2>${tl("Angebote", "Quotes")}</h2><div class="form">
+      <label class="field"><span>${tl("Angebot 1 (€)", "Quote 1 (€)")}</span>${inp("quoteA", "number", 'min="0"')}</label>
+      <label class="field"><span>${tl("von", "from")}</span>${inp("quoteAFrom")}</label>
+      <label class="field"><span>${tl("Angebot 2 (€)", "Quote 2 (€)")}</span>${inp("quoteB", "number", 'min="0"')}</label>
+      <label class="field"><span>${tl("von", "from")}</span>${inp("quoteBFrom")}</label>
+      <div class="wide">${check}</div></div>
+      ${sample && (qA || qB) ? `<div class="ai" style="margin-top:14px"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">${tl("Verhandlungshilfe", "Negotiation helper")}</div><h3>${tl("Argumente + E-Mail", "Arguments + email")}</h3></div><button class="btn sm primary" data-act="negotiate" data-id="${id}" ${t._busy ? "disabled" : ""}>${t._busy ? `<span class="spin"></span>` : tl("Erstellen", "Create")}</button></div>
+        ${neg ? `<ul style="margin:10px 0">${(neg.arguments || []).map(a => `<li>${esc(a)}</li>`).join("")}</ul><div class="mail" id="neg-mail"><b>${esc(neg.subject || "")}</b>\n\n${esc(neg.body || "")}</div><button class="btn sm" style="margin-top:8px" data-copy-el="neg-mail">${tl("E-Mail kopieren", "Copy email")}</button>${neg.bodyEn ? `<details style="margin-top:8px"><summary class="muted">${tl("Übersetzung", "Translation")}</summary><p style="white-space:pre-wrap;font-size:14px">${esc(neg.bodyEn)}</p></details>` : ""}` : ""}</div>` : ""}</section>
+    <section class="panel"><h2>${tl("Abschluss", "Closing")}</h2><div class="form">
+      <label class="field"><span>${tl("Erledigt am", "Done on")}</span>${inp("doneAt", "datetime-local")}</label>
+      <label class="field"><span>${tl("Ausgeführt von", "Done by")}</span>${sel("doneBy", contrOpts)}</label>
+      <label class="field"><span>${tl("Endgültige Kosten (€)", "Final cost (€)")}</span>${inp("cost", "number", 'min="0"')}</label>
+      <div class="field"><span>${tl("Rechnung", "Invoice")}</span>${t.invoiceId ? `<a class="btn sm" href="${blob(t.invoiceId)}" target="_blank" rel="noopener">${tl("Rechnung ansehen", "View invoice")}</a>` : ""}${assets ? `<label class="btn sm" style="cursor:pointer;width:max-content">${t.invoiceId ? tl("Ersetzen", "Replace") : tl("Foto / PDF hochladen", "Upload photo / PDF")}<input type="file" accept="image/*,application/pdf" data-invoice="${id}" hidden></label>` : ""}</div>
+      <div class="wide">${invCheck}</div></div></section>
+  </div>
+  <div class="row" style="margin-top:16px"><button class="btn danger sm" data-act="del-ticket" data-id="${id}">${tl("Ticket löschen", "Delete ticket")}</button></div>`;
 }
 
-/* ---------- Prüfungen ---------- */
+/* ---------- Briefing & E-Mails ---------- */
+function ticketFacts(t) {
+  const m = S.machines[t.machineId]; const p = S.properties[t.propertyId] || {}; const c = ticketCat(t); const s = symOf(t);
+  const mDe = m ? `${m.name || c?.name.de || "Anlage"}${m.brand || m.model ? ` (${[m.brand, m.model].filter(Boolean).join(" ")}${m.year ? ", Baujahr " + m.year : ""})` : ""}${m.location ? ", Standort: " + m.location : ""}` : (c ? c.name.de : "");
+  const mEn = m ? `${m.name || c?.name.en || "unit"}${m.brand || m.model ? ` (${[m.brand, m.model].filter(Boolean).join(" ")}${m.year ? ", built " + m.year : ""})` : ""}${m.location ? ", location: " + m.location : ""}` : (c ? c.name.en : "");
+  const contr = S.contractors[t.contractorId];
+  const tenantC = (p.contacts || []).find(x => x.role === "tenant");
+  return { m, p, c, s, mDe, mEn, contr, tenantC, sign: S.settings.signName || "Ihre Objektverwaltung", addr: [p.name, p.address].filter(Boolean).join(", ") };
+}
+function briefing(t) {
+  const f = ticketFacts(t);
+  const sev = SEV[t.severity] || SEV.amber;
+  const urgDe = { red: "Es ist ein Notfall.", amber: "Es ist dringend, bitte heute oder morgen.", green: "Es ist nicht eilig, der nächste freie Termin reicht." }[t.severity] || "";
+  const urgEn = { red: "It's an emergency.", amber: "It's urgent, today or tomorrow please.", green: "It's not urgent, the next free slot is fine." }[t.severity] || "";
+  const de = `Guten Tag, hier ist ${f.sign}. Im Objekt ${f.addr} gibt es eine Störung: ${f.s.l.de}${f.mDe ? `, betroffen ist ${f.mDe}` : ""}.${t.notes ? ` Der Mieter sagt: ${t.notes.split("\n")[0]}.` : ""} ${urgDe} Wann können Sie kommen?`;
+  const en = `Hello, this is ${f.sign}. At ${f.addr} there is a fault: ${f.s.l.en}${f.mEn ? `, affecting ${f.mEn}` : ""}.${t.notes ? ` The tenant says: ${t.notes.split("\n")[0]}.` : ""} ${urgEn} When can you come?`;
+  const text = [f.c?.what.de, ...(f.c?.sym || []).flatMap(s => [s.act.de, ...s.c.map(x => x.t.de + " " + x.w.de)])].join(" ").toLowerCase();
+  const terms = GLOSSARY.filter(g => { const w = g[0].split(/[ (/]/)[0].toLowerCase(); return w.length > 3 && text.includes(w); }).slice(0, 8);
+  return { de: de.replace(/\.\./g, "."), en: en.replace(/\.\./g, "."), terms, sev };
+}
+const MAIL_KINDS = [["order", L("Auftrag", "Order")], ["reminder", L("Erinnerung", "Reminder")], ["quote", L("Angebot anfragen", "Request quote")], ["tenant", L("Info an Mieter", "Tenant update")], ["finance", L("Finanzteam", "Finance team")]];
+function mailDraft(kind, t) {
+  const f = ticketFacts(t);
+  const sevDe = (SEV[t.severity] || SEV.amber).label.de, sevEn = (SEV[t.severity] || SEV.amber).label.en;
+  const notes = (t.notes || "").trim();
+  const onSite = f.tenantC ? `${f.tenantC.name}${f.tenantC.phone ? ", Tel. " + f.tenantC.phone : ""}` : (f.p.tenantContact || f.p.tenant || "");
+  const lim = Number(S.settings.limit) || 0;
+  const firstContact = (t.log || []).filter(e => e.type === "email" || e.type === "call").map(e => e.at).sort()[0];
+  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowDe = tomorrow.toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "2-digit" });
+  const contrMail = f.contr?.email || "";
+  const hi = "Sehr geehrte Damen und Herren,";
+  const bye = `Mit freundlichen Grüßen\n${f.sign}`;
+  const byeEn = `Kind regards\n${f.sign}`;
+  const subjBase = `${f.s.l.de} – ${f.p.name || ""}`;
+  const block = `Objekt: ${f.addr}\n${f.mDe ? "Anlage: " + f.mDe + "\n" : ""}Problem: ${f.s.l.de}\n${notes ? "Details: " + notes + "\n" : ""}Dringlichkeit: ${sevDe}`;
+  const blockEn = `Property: ${f.addr}\n${f.mEn ? "Equipment: " + f.mEn + "\n" : ""}Problem: ${f.s.l.en}\n${notes ? "Details: " + notes + "\n" : ""}Urgency: ${sevEn}`;
+  if (kind === "order") return { to: contrMail, toHint: tl("Dienstleister im Ticket wählen (E-Mail beim Dienstleister hinterlegen)", "Choose a contractor on the ticket (save their email)"), subject: `Reparaturauftrag: ${subjBase}`,
+    body: `${hi}\n\nwir beauftragen Sie mit der Prüfung und Behebung folgender Störung:\n\n${block}\n\nAnsprechpartner vor Ort: ${onSite || "bitte bei uns erfragen"}\n\nBitte teilen Sie uns kurz mit, wann Sie vor Ort sein können.${lim ? ` Sollten die Kosten voraussichtlich ${moneyDe(lim)} überschreiten, bitten wir vorab um ein Angebot.` : ""} Nach dem Einsatz bitten wir um einen kurzen Arbeitsbericht.\n\n${bye}`,
+    en: `Dear Sir or Madam,\n\nwe ask you to inspect and fix the following fault:\n\n${blockEn}\n\nContact on site: ${onSite || "please ask us"}\n\nPlease let us know when you can come.${lim ? ` If the cost is likely to exceed ${money(lim)}, please send a quote first.` : ""} Please send a short job report afterwards.\n\n${byeEn}` };
+  if (kind === "reminder") return { to: contrMail, toHint: tl("Dienstleister im Ticket wählen", "Choose a contractor on the ticket"), subject: `Erinnerung: ${subjBase}`,
+    body: `${hi}\n\nwir hatten Sie${firstContact ? " am " + fmtDTde(firstContact) : ""} wegen folgender Störung kontaktiert und haben noch keine Rückmeldung erhalten:\n\n${block}\n\nBitte teilen Sie uns bis ${tomorrowDe} mit, wann Sie vor Ort sein können. Andernfalls müssen wir einen anderen Fachbetrieb beauftragen.\n\n${bye}`,
+    en: `Dear Sir or Madam,\n\nwe contacted you${firstContact ? " on " + fmtDT(firstContact, "en-GB") : ""} about the fault below and have not heard back yet:\n\n${blockEn}\n\nPlease let us know by tomorrow when you can come. Otherwise we will have to hire another company.\n\n${byeEn}` };
+  if (kind === "quote") return { to: contrMail, toHint: tl("Dienstleister im Ticket wählen", "Choose a contractor on the ticket"), subject: `Angebotsanfrage: ${subjBase}`,
+    body: `${hi}\n\nfür folgende Reparatur bitten wir um ein schriftliches Angebot:\n\n${block}\n\nBitte schlüsseln Sie das Angebot nach Material, Arbeitszeit und Anfahrt auf und nennen Sie einen möglichen Termin. Eine Besichtigung vor Ort ist nach Absprache möglich (Ansprechpartner: ${onSite || "bitte bei uns erfragen"}).\n\n${bye}`,
+    en: `Dear Sir or Madam,\n\nplease send us a written quote for the following repair:\n\n${blockEn}\n\nPlease break the quote down into materials, labour and call-out, and suggest a date. A site visit can be arranged (contact: ${onSite || "please ask us"}).\n\n${byeEn}` };
+  if (kind === "tenant") {
+    const appt = t.appointment ? `Der Techniker${f.contr ? " von " + f.contr.name : ""} kommt am ${fmtDTde(t.appointment)}. Bitte sorgen Sie dafür, dass er Zugang zu ${f.m?.location || "den betroffenen Räumen"} hat.` : `Wir haben ${f.contr ? f.contr.name : "einen Fachbetrieb"} informiert und melden uns, sobald ein Termin feststeht.`;
+    const apptEn = t.appointment ? `The technician${f.contr ? " from " + f.contr.name : ""} will come on ${fmtDT(t.appointment, "en-GB")}. Please make sure they can access ${f.m?.location || "the affected area"}.` : `We have informed ${f.contr ? f.contr.name : "a contractor"} and will let you know as soon as there is a date.`;
+    const done = t.status === "done";
+    return { to: f.tenantC?.email || "", toHint: tl("E-Mail des Mieter-Kontakts im Objekt hinterlegen", "Save the tenant contact's email on the property"), subject: done ? `Erledigt: ${f.s.l.de}` : `Ihre Störungsmeldung: ${f.s.l.de}`,
+      body: `Guten Tag${f.tenantC ? " " + f.tenantC.name : ""},\n\n${done ? `die gemeldete Störung (${f.s.l.de}) wurde${t.doneAt ? " am " + fmtDTde(t.doneAt) : ""} behoben. Bitte melden Sie sich, falls das Problem erneut auftritt.` : `vielen Dank für Ihre Meldung vom ${fmtDate(t.created, "de-DE")} (${f.s.l.de}${f.m ? ", " + (f.m.name || f.c?.name.de) : ""}).\n\n${appt}`}\n\n${bye}`,
+      en: `Hello${f.tenantC ? " " + f.tenantC.name : ""},\n\n${done ? `the reported fault (${f.s.l.en}) was fixed${t.doneAt ? " on " + fmtDT(t.doneAt, "en-GB") : ""}. Please tell us if it happens again.` : `thank you for your report from ${fmtDate(t.created, "en-GB")} (${f.s.l.en}).\n\n${apptEn}`}\n\n${byeEn}` };
+  }
+  const cost = Number(t.cost) || 0; const q = Math.max(Number(t.quoteA) || 0, Number(t.quoteB) || 0);
+  const payerDe = t.payer ? PAYERS[t.payer].de : "noch zu klären", payerEn = t.payer ? PAYERS[t.payer].en : "to be decided";
+  if (t.status === "done" && cost) return { to: S.settings.financeEmail || "", toHint: tl("Finanz-E-Mail in der Übersicht unter Einstellungen eintragen", "Add the finance email under Preferences on the overview"), subject: `Rechnung zur Zahlung: ${subjBase}`,
+    body: `Hallo Finanzteam,\n\nanbei die Rechnung${f.contr ? " von " + f.contr.name : ""} über ${moneyDe(cost)} für folgende Reparatur:\n\n${block}\n\nDie Arbeiten wurden${t.doneAt ? " am " + fmtDTde(t.doneAt) : ""} abgeschlossen.${q ? ` Das Angebot lag bei ${moneyDe(Math.min(...[t.quoteA, t.quoteB].map(Number).filter(Boolean)))}.` : ""}\nKostenträger: ${payerDe}\n\nBitte zur Zahlung anweisen.\n\nViele Grüße\n${f.sign}`,
+    en: `Hello finance team,\n\nattached is the invoice${f.contr ? " from " + f.contr.name : ""} for ${money(cost)} for this repair:\n\n${blockEn}\n\nThe work was completed${t.doneAt ? " on " + fmtDT(t.doneAt, "en-GB") : ""}.\nWho pays: ${payerEn}\n\nPlease arrange payment.\n\nBest regards\n${f.sign}` };
+  return { to: S.settings.financeEmail || "", toHint: tl("Finanz-E-Mail in der Übersicht unter Einstellungen eintragen", "Add the finance email under Preferences on the overview"), subject: `Kostenfreigabe: ${subjBase}`,
+    body: `Hallo Finanzteam,\n\nfür folgende Reparatur bitte ich um Kostenfreigabe:\n\n${block}\n\n${q ? `Angebot${t.quoteB ? "e" : ""}: ${[t.quoteA && `${moneyDe(t.quoteA)}${t.quoteAFrom ? " (" + t.quoteAFrom + ")" : ""}`, t.quoteB && `${moneyDe(t.quoteB)}${t.quoteBFrom ? " (" + t.quoteBFrom + ")" : ""}`].filter(Boolean).join(", ")}\n` : "Ein Angebot liegt noch nicht vor.\n"}Freigabegrenze: ${moneyDe(lim)}\nKostenträger: ${payerDe}\n\nViele Grüße\n${f.sign}`,
+    en: `Hello finance team,\n\nI'm asking for cost approval for this repair:\n\n${blockEn}\n\n${q ? `Quote(s): ${[t.quoteA && money(t.quoteA), t.quoteB && money(t.quoteB)].filter(Boolean).join(", ")}\n` : "No quote yet.\n"}Approval limit: ${money(lim)}\nWho pays: ${payerEn}\n\nBest regards\n${f.sign}` };
+}
+
+/* ---------- Prüfungen, Dienstleister, Wissen, Wörterbuch ---------- */
 function viewInspections() {
   const is = vals("inspections").sort((a, b) => (a.next || "9").localeCompare(b.next || "9"));
   return `<div class="head"><div><div class="eyebrow">${tl("Prüfpflichten & Wartung", "Required checks & service")}</div><h1>${tl("Prüfungen", "Inspections")}</h1></div><button class="btn primary" data-act="new-insp">${tl("Prüfung eintragen", "Add inspection")}</button></div>
@@ -995,53 +1342,46 @@ function viewInspections() {
     : `<div class="empty"><b>${tl("Noch keine Prüfungen", "No inspections yet")}</b>${tl("Öffne ein Objekt und tippe auf „Pflichtprüfungen vorschlagen“.", "Open a property and tap „Suggest required checks“.")}</div>`}
   <p class="muted" style="font-size:12px;margin-top:12px">${tl("Intervalle sind typische Werte. Maßgeblich sind Gesetz, Prüfbuch, Herstellerangaben und dein Versicherer.", "Intervals are typical values. What counts is the law, the inspection log, the manufacturer and your insurer.")}</p>`;
 }
-
-/* ---------- Dienstleister ---------- */
 function viewContractors() {
   const cs = vals("contractors").sort((a, b) => (a.trade || "").localeCompare(b.trade || ""));
   return `<div class="head"><div><div class="eyebrow">${cs.length} ${tl("Kontakte", "contacts")}</div><h1>${tl("Dienstleister", "Contractors")}</h1></div><button class="btn primary" data-act="new-contr">${tl("Dienstleister anlegen", "Add contractor")}</button></div>
   ${cs.length ? `<div class="grid g2">${cs.map(c => {
     const spent = vals("tickets").filter(t => t.contractorId === c.id).reduce((s, t) => s + (Number(t.cost) || 0), 0);
     return `<section class="panel"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">${esc(tr(TRADES[c.trade]))}</div><h2>${esc(c.name)}${example(c)}</h2></div><button class="btn sm ghost" data-act="edit-contr" data-id="${c.id}">${tl("Bearbeiten", "Edit")}</button></div>
-    <div class="row" style="margin-top:10px"><span class="phone">${esc(c.phone || "–")}</span>${c.phone ? `<button class="btn sm" data-copy="${esc(c.phone)}">${tl("Kopieren", "Copy")}</button>` : ""}${c.emergency ? `<span class="tag">24/7 ${tl("Notdienst", "emergency")}</span>` : ""}</div>
+    <div class="row" style="margin-top:10px"><span class="phone">${esc(c.phone || "–")}</span>${copyBtn(c.phone)}${c.emergency ? `<span class="tag">24/7 ${tl("Notdienst", "emergency")}</span>` : ""}</div>
     ${c.email ? `<div class="mono" style="font-size:13px;margin-top:4px;user-select:all">${esc(c.email)}</div>` : ""}
     ${c.rates ? `<p style="font-size:14px;margin:8px 0 0"><b>${tl("Konditionen", "Rates")}:</b> ${esc(c.rates)}</p>` : ""}
     ${c.notes ? `<p class="muted" style="font-size:14px;margin:6px 0 0">${esc(c.notes)}</p>` : ""}
     <p class="muted" style="font-size:12px;margin:8px 0 0">${tl("Bisher bezahlt", "Paid so far")}: <span class="mono">${money(spent)}</span></p></section>`; }).join("")}</div>`
   : `<div class="empty"><b>${tl("Noch keine Dienstleister", "No contractors yet")}</b>${tl("Lege Heizungsfirma, Elektriker, Torfirma usw. an.", "Add your heating firm, electrician, door firm etc.")}</div>`}`;
 }
-
-/* ---------- Anlagen-Wissen ---------- */
 function viewCatalog() {
-  const c = CATALOG[catOpen];
+  const c = CATALOG[UI.catOpen];
   return `<div class="head"><div><div class="eyebrow">${Object.keys(CATALOG).length} ${tl("Anlagentypen", "equipment types")}</div><h1>${tl("Anlagen-Wissen", "Equipment guide")}</h1><p class="muted prose" style="margin:6px 0 0">${tl("Was jede Anlage macht, was typischerweise kaputt geht und wie dringend es ist.", "What each system does, what typically goes wrong and how urgent it is.")}</p></div></div>
-  <div class="grid g3" style="margin-bottom:18px">${Object.entries(CATALOG).map(([k, x]) => `<button class="plate cat-card" style="text-align:left;cursor:pointer;${catOpen === k ? "border-color:var(--accent)" : ""}" data-cat="${k}"><div class="p-top"><span class="p-code">${x.code}</span><span class="tag">${esc(tr(TRADES[x.trade]))}</span></div><div class="p-name">${esc(tr(x.name))}</div><div class="muted" style="font-size:13px;margin-top:4px">${x.sym.length} ${tl("Störungsbilder", "fault types")}</div></button>`).join("")}</div>
+  <div class="grid g3" style="margin-bottom:18px">${Object.entries(CATALOG).map(([k, x]) => `<button class="plate cat-card" style="text-align:left;cursor:pointer;${UI.catOpen === k ? "border-color:var(--accent)" : ""}" data-cat="${k}"><div class="p-top"><span class="p-code">${x.code}</span><span class="tag">${esc(tr(TRADES[x.trade]))}</span></div><div class="p-name">${esc(tr(x.name))}</div><div class="muted" style="font-size:13px;margin-top:4px">${x.sym.length} ${tl("Störungsbilder", "fault types")}</div></button>`).join("")}</div>
   ${c ? `<section class="panel" id="cat-detail"><div class="eyebrow">${c.code}</div><h2>${esc(tr(c.name))}</h2><p class="prose" style="margin:8px 0 14px">${esc(tr(c.what))}</p>
     ${c.insp.length ? `<p style="margin:0 0 14px"><b>${tl("Prüfpflicht / Wartung", "Required checks / service")}:</b> ${c.insp.map(x => esc(tr(x.l))).join(" · ")}</p>` : ""}
     ${c.sym.map(s => `<details style="border-top:1px solid var(--line);padding:10px 0"><summary>${sevPill(s.sev)} ${esc(tr(s.l))}</summary><p style="margin:8px 0">${esc(tr(s.act))}</p>${[...s.c].sort((a, b) => b.p - a.p).map(x => `<div class="cause"><div>${meter(x.p)}</div><div><b>${esc(tr(x.t))}</b> <span class="cost">${costSigns(x.k)}</span><div class="muted" style="font-size:14px">${esc(tr(x.w))}</div></div></div>`).join("")}</details>`).join("")}</section>` : `<p class="muted">${tl("Wähle einen Anlagentyp.", "Pick an equipment type.")}</p>`}`;
 }
-
-/* ---------- Wörterbuch ---------- */
 function viewGlossary() {
-  const q = glossQ.trim().toLowerCase();
-  const rows = GLOSSARY.filter(g => !q || g.join(" ").toLowerCase().includes(q));
   return `<div class="head"><div><div class="eyebrow">${GLOSSARY.length} ${tl("Begriffe", "terms")}</div><h1>${tl("Wörterbuch Haustechnik", "Building services glossary")}</h1></div></div>
-  <input type="search" id="gloss-q" placeholder="${tl("Suchen, z. B. Druck, Tor, FI …", "Search, e.g. pressure, door, RCD …")}" value="${esc(glossQ)}" style="max-width:420px;margin-bottom:12px">
-  <div class="panel" id="gloss-list">${glossRows(rows)}</div>`;
+  <input type="search" id="gloss-q" placeholder="${tl("Suchen, z. B. Druck, Tor, FI …", "Search, e.g. pressure, door, RCD …")}" value="${esc(UI.glossQ)}" style="max-width:420px;margin-bottom:12px">
+  <div class="panel" id="gloss-list">${glossRows()}</div>`;
 }
-function glossRows(rows) {
+function glossRows() {
+  const q = UI.glossQ.trim().toLowerCase();
+  const rows = GLOSSARY.filter(g => !q || g.join(" ").toLowerCase().includes(q));
   return rows.length ? rows.map(g => `<div class="gl-row"><b>${esc(g[0])}</b><span class="muted">${esc(g[1])}</span><span class="gl-x">${esc(lang === "en" ? g[3] : g[2])}</span></div>`).join("") : `<p class="muted">${tl("Nichts gefunden.", "Nothing found.")}</p>`;
 }
 
 /* ---------- Modal + Formulare ---------- */
-function openModal(html) { $("#modal-root").innerHTML = `<div class="overlay" data-overlay><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`; const f = $("#modal-root input, #modal-root select, #modal-root textarea"); if (f) f.focus(); }
+function openModal(html) { $("#modal-root").innerHTML = `<div class="overlay" data-overlay><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`; const f = $("#modal-root input:not([type=file]), #modal-root select, #modal-root textarea"); if (f) f.focus(); }
 function closeModal() { $("#modal-root").innerHTML = ""; }
-function formModal(title, fields, data, onSave, extra = "") {
+function formModal(title, fields, data, onSave, extra = "", delHtml = "") {
   openModal(`<div class="mhead"><h2>${esc(title)}</h2><button class="btn ghost sm" data-close>${tl("Schließen", "Close")}</button></div>
   <form id="fm" class="form">${fields.map(f => {
-    const v = data[f.k] ?? f.def ?? "";
-    const id = "f-" + f.k;
-    let input;
+    if (f.type === "heading") return `<div class="wide eyebrow" style="margin-top:6px">${esc(f.label)}</div>`;
+    const v = data[f.k] ?? f.def ?? ""; const id = "f-" + f.k; let input;
     if (f.type === "select") input = `<select id="${id}">${f.opts.map(([ov, ol]) => `<option value="${esc(ov)}" ${String(v) === String(ov) ? "selected" : ""}>${esc(ol)}</option>`).join("")}</select>`;
     else if (f.type === "textarea") input = `<textarea id="${id}">${esc(v)}</textarea>`;
     else if (f.type === "check") input = `<label class="row" style="gap:8px"><input type="checkbox" id="${id}" ${v ? "checked" : ""}> ${esc(f.hint || "")}</label>`;
@@ -1049,48 +1389,64 @@ function formModal(title, fields, data, onSave, extra = "") {
     else input = `<input type="${f.type || "text"}" id="${id}" value="${esc(v)}" ${f.ph ? `placeholder="${esc(f.ph)}"` : ""}>`;
     return `<label class="field ${f.wide ? "wide" : ""}"><span>${esc(f.label)}</span>${input}</label>`; }).join("")}</form>
   ${extra}
-  <div class="row" style="justify-content:space-between;margin-top:16px"><span>${data.__del || ""}</span><button class="btn primary" id="fm-save">${tl("Speichern", "Save")}</button></div>`);
+  <div class="row" style="justify-content:space-between;margin-top:16px"><span>${delHtml}</span><button class="btn primary" id="fm-save">${tl("Speichern", "Save")}</button></div>`);
   $("#fm-save").onclick = async () => {
     const out = {}; let file = null;
-    fields.forEach(f => { const el = $("#f-" + f.k); if (!el) return; if (f.type === "check") out[f.k] = el.checked; else if (f.type === "file") file = el.files[0] || null; else out[f.k] = el.value.trim(); });
+    fields.forEach(f => { if (f.type === "heading") return; const el = $("#f-" + f.k); if (!el) return; if (f.type === "check") out[f.k] = el.checked; else if (f.type === "file") file = el.files[0] || null; else out[f.k] = el.value.trim(); });
     if (fields.some(f => f.req && !out[f.k])) { toast(tl("Bitte Pflichtfelder ausfüllen", "Please fill in the required fields")); return; }
     $("#fm-save").disabled = true;
-    await onSave(out, file); closeModal();
+    closeModal(); await onSave(out, file);
   };
   $("#fm").onsubmit = e => e.preventDefault();
 }
-async function uploadImage(file) {
+async function uploadFile(file) {
   if (!file || !assets) return null;
   try { const r = await assets.upload(file); return r.id; } catch (e) { toast(tl("Upload fehlgeschlagen: ", "Upload failed: ") + (e.message || e.code)); return null; }
 }
 const propOpts = () => vals("properties").map(p => [p.id, p.name]);
 const tradeOpts = () => Object.entries(TRADES).map(([k, v]) => [k, tr(v)]);
+const delBtn = (act, id, label, extra = "") => `<button class="btn danger sm" data-act="${act}" data-id="${id}" ${extra}>${esc(label)}</button>`;
 
 function propForm(id) {
   const p = id ? S.properties[id] : {};
-  const fields = [
+  formModal(id ? tl("Objekt bearbeiten", "Edit property") : tl("Neues Objekt", "New property"), [
     { k: "name", label: tl("Name *", "Name *"), req: true, ph: tl("z. B. Logistikhalle Reisholz", "e.g. Reisholz warehouse") },
     { k: "type", label: tl("Art", "Type"), type: "select", opts: [["Halle", tl("Lager-/Logistikhalle", "Warehouse")], ["Büro", tl("Bürogebäude", "Office")], ["Gewerbe", tl("Gewerbe gemischt", "Mixed commercial")], ["Wohnen", tl("Wohnen", "Residential")]] },
     { k: "address", label: tl("Adresse", "Address"), wide: true },
     { k: "tenant", label: tl("Mieter (Firma)", "Tenant (company)") },
-    { k: "tenantContact", label: tl("Ansprechpartner beim Mieter", "Tenant contact") },
+    { k: "tenantContact", label: tl("Hauptansprechpartner beim Mieter", "Main tenant contact") },
     { k: "rent", label: tl("Miete / Monat (€)", "Rent / month (€)"), type: "number" },
     { k: "area", label: tl("Fläche (m²)", "Area (m²)"), type: "number" },
     { k: "leaseEnd", label: tl("Mietvertrag bis", "Lease until"), type: "date" },
     ...(assets ? [{ k: "photo", label: tl("Foto", "Photo"), type: "file" }] : []),
     { k: "notes", label: tl("Notizen", "Notes"), type: "textarea", wide: true }
-  ];
-  formModal(id ? tl("Objekt bearbeiten", "Edit property") : tl("Neues Objekt", "New property"), fields, { ...p, __del: id ? `<button class="btn danger sm" data-act="del-prop" data-id="${id}">${tl("Objekt löschen", "Delete property")}</button>` : "" }, async (o, file) => {
-    const nid = id || uid(); const photoId = file ? await uploadImage(file) : null;
-    delete o.photo;
+  ], p, async (o, file) => {
+    const nid = id || uid(); const photoId = file ? await uploadFile(file) : null; delete o.photo;
     await save("properties", nid, { ...(S.properties[nid] || {}), ...o, rent: Number(o.rent) || 0, ...(photoId ? { photoId } : {}) });
     if (!id) location.hash = "p-" + nid;
-  });
+  }, "", id ? delBtn("del-prop", id, tl("Objekt löschen", "Delete property")) : "");
+}
+function buildingForm(id) {
+  const p = S.properties[id]; const b = p.building || {};
+  const fields = BUILDING_GROUPS.flatMap(g => [{ type: "heading", label: tr(g.t) }, ...g.f.map(([k, l]) => ({ k, label: tr(l) }))]);
+  formModal(tl("Gebäudedaten", "Building details"), fields, b, async o => { const nb = {}; Object.entries(o).forEach(([k, v]) => { if (v) nb[k] = v; }); await patch("properties", id, { building: nb }); });
+}
+function contactForm(propId, cid) {
+  const p = S.properties[propId]; const list = p.contacts || []; const c = list.find(x => x.id === cid) || { role: "tenant" };
+  formModal(cid ? tl("Kontakt bearbeiten", "Edit contact") : tl("Neuer Kontakt", "New contact"), [
+    { k: "name", label: tl("Name *", "Name *"), req: true },
+    { k: "role", label: tl("Rolle", "Role"), type: "select", opts: Object.entries(CONTACT_ROLES).map(([k, v]) => [k, tr(v)]) },
+    { k: "phone", label: tl("Telefon", "Phone"), type: "tel" },
+    { k: "email", label: "E-Mail", type: "email" }
+  ], c, async o => {
+    const next = cid ? list.map(x => x.id === cid ? { ...x, ...o } : x) : [...list, { id: uid(), ...o }];
+    await patch("properties", propId, { contacts: next });
+  }, "", cid ? `<button class="btn danger sm" data-act="del-contact" data-prop="${propId}" data-cid="${cid}">${tl("Löschen", "Delete")}</button>` : "");
 }
 function machineForm(id, propId) {
   const m = id ? S.machines[id] : { propertyId: propId };
-  const fields = [
-    { k: "cat", label: tl("Anlagentyp *", "Equipment type *"), type: "select", req: true, opts: Object.entries(CATALOG).map(([k, c]) => [k, c.code + " · " + tr(c.name)]) },
+  formModal(id ? tl("Anlage bearbeiten", "Edit equipment") : tl("Neue Anlage", "New equipment"), [
+    { k: "cat", label: tl("Anlagentyp *", "Equipment type *"), type: "select", req: true, opts: [...Object.entries(CATALOG).map(([k, c]) => [k, c.code + " · " + tr(c.name)]), ["other", "ANL · " + tr(OTHER_CAT.name)]] },
     { k: "name", label: tl("Eigene Bezeichnung", "Your label"), ph: tl("z. B. Heizung Halle A", "e.g. Heating hall A") },
     { k: "propertyId", label: tl("Objekt", "Property"), type: "select", opts: propOpts() },
     { k: "location", label: tl("Standort im Objekt", "Location in building"), ph: tl("z. B. Heizraum UG", "e.g. boiler room basement") },
@@ -1104,12 +1460,11 @@ function machineForm(id, propId) {
     { k: "warrantyUntil", label: tl("Gewährleistung bis", "Warranty until"), type: "date" },
     { k: "contract", label: tl("Wartungsvertrag", "Service contract"), wide: true, ph: tl("z. B. Vollwartung, 1× jährlich, 450 € netto", "e.g. full service, yearly, €450 net") },
     { k: "notes", label: tl("Notizen", "Notes"), type: "textarea", wide: true }
-  ];
-  formModal(id ? tl("Anlage bearbeiten", "Edit equipment") : tl("Neue Anlage", "New equipment"), fields, { ...m, __del: id ? `<button class="btn danger sm" data-act="del-machine" data-id="${id}">${tl("Anlage löschen", "Delete equipment")}</button>` : "" }, async o => {
+  ], m, async o => {
     const nid = id || uid();
     await save("machines", nid, { ...(S.machines[nid] || {}), ...o });
     if (!id) location.hash = "m-" + nid;
-  }, !id && sample && imgOK ? `<p class="muted" style="font-size:13px;margin:12px 0 0">${tl("Tipp: Nach dem Speichern kannst du ein Foto vom Typenschild hochladen. Die KI füllt Hersteller, Modell und Baujahr dann selbst aus.", "Tip: after saving you can upload a type plate photo. The AI then fills in make, model and year.")}</p>` : "");
+  }, !id && sample && imgOK ? `<p class="muted" style="font-size:13px;margin:12px 0 0">${tl("Weißt du nicht, was es ist? Schließen und auf der Objektseite „Unbekannte Anlage per Foto erkennen“ nutzen.", "Not sure what it is? Close this and use „Identify unknown equipment by photo“ on the property page.")}</p>` : "", id ? delBtn("del-machine", id, tl("Anlage löschen", "Delete equipment")) : "");
 }
 function contrForm(id, trade) {
   const c = id ? S.contractors[id] : { trade: trade || "heating" };
@@ -1121,7 +1476,7 @@ function contrForm(id, trade) {
     { k: "emergency", label: tl("Notdienst", "Emergency service"), type: "check", hint: tl("24/7 erreichbar", "Available 24/7") },
     { k: "rates", label: tl("Konditionen", "Rates"), ph: tl("z. B. 78 €/Std., Anfahrt 45 €", "e.g. €78/h, call-out €45") },
     { k: "notes", label: tl("Notizen", "Notes"), type: "textarea", wide: true }
-  ], { ...c, __del: id ? `<button class="btn danger sm" data-act="del-contr" data-id="${id}">${tl("Löschen", "Delete")}</button>` : "" }, async o => save("contractors", id || uid(), { ...(S.contractors[id] || {}), ...o }));
+  ], c, async o => save("contractors", id || uid(), { ...(S.contractors[id] || {}), ...o }), "", id ? delBtn("del-contr", id, tl("Löschen", "Delete")) : "");
 }
 function inspForm(id) {
   const i = id ? { ...S.inspections[id], title: inspTitle(S.inspections[id]) } : { months: 12 };
@@ -1132,12 +1487,80 @@ function inspForm(id) {
     { k: "months", label: tl("Intervall (Monate)", "Interval (months)"), type: "number" },
     { k: "last", label: tl("Zuletzt geprüft", "Last done"), type: "date" },
     { k: "next", label: tl("Nächster Termin (leer = automatisch)", "Next due (empty = automatic)"), type: "date" }
-  ], { ...i, __del: id ? `<button class="btn danger sm" data-act="del-insp" data-id="${id}">${tl("Löschen", "Delete")}</button>` : "" }, async o => {
-    const months = Number(o.months) || 12;
-    const next = o.next || (o.last ? addMonths(o.last, months) : today());
+  ], i, async o => {
+    const months = Number(o.months) || 12; const next = o.next || (o.last ? addMonths(o.last, months) : today());
     const prev = S.inspections[id] || {}; const keepL = prev.titleL && o.title === inspTitle(prev);
     await save("inspections", id || uid(), { ...prev, ...o, months, next, titleL: keepL ? prev.titleL : null });
-  });
+  }, "", id ? delBtn("del-insp", id, tl("Löschen", "Delete")) : "");
+}
+function remForm(id, propId) {
+  const r = id ? S.reminders[id] : { propertyId: propId };
+  const at = r.at || (today() + "T09:00");
+  formModal(id ? tl("Erinnerung bearbeiten", "Edit reminder") : tl("Neue Erinnerung", "New reminder"), [
+    { k: "subject", label: tl("Betreff *", "Subject *"), req: true, wide: true, ph: tl("z. B. Torservice wegen Angebot anrufen", "e.g. call the door firm about the quote") },
+    { k: "propertyId", label: tl("Objekt", "Property"), type: "select", opts: propOpts() },
+    { k: "date", label: tl("Datum", "Date"), type: "date" },
+    { k: "time", label: tl("Uhrzeit", "Time"), type: "time" },
+    { k: "note", label: tl("Notiz", "Note"), type: "textarea", wide: true }
+  ], { ...r, date: at.slice(0, 10), time: at.slice(11, 16) }, async o => {
+    const nat = (o.date || today()) + "T" + (o.time || "09:00");
+    const prev = S.reminders[id] || {};
+    await save("reminders", id || uid(), { ...prev, subject: o.subject, propertyId: o.propertyId, note: o.note, at: nat, done: prev.at !== nat ? false : !!prev.done });
+    ALERTED.delete(id);
+  }, `<p class="muted" style="font-size:13px;margin:12px 0 0">${tl("Die Erinnerung erscheint als Hinweis, solange die App geöffnet ist, und oben in der Übersicht.", "The reminder pops up while the app is open, and appears at the top of the overview.")}</p>`, id ? delBtn("del-rem", id, tl("Löschen", "Delete")) : "");
+}
+
+/* ---------- Ticket-Logik ---------- */
+function logPatch(id, entries, changes = {}) {
+  const t = S.tickets[id]; const log = [...(t.log || []), ...entries.map(e => ({ at: nowLocal(), note: "", ...e }))];
+  return patch("tickets", id, { ...changes, log });
+}
+async function onTicketField(id, f, el) {
+  const t = S.tickets[id]; if (!t) return;
+  let v = el.value; const extra = [];
+  if (["quoteA", "quoteB", "cost"].includes(f)) v = Number(v) || "";
+  if (String(t[f] ?? "") === String(v)) return;
+  const ch = { [f]: v };
+  if (f === "status") {
+    extra.push({ type: "status", note: tr(STATUS[v]) });
+    if (v === "done") { if (!t.doneAt) ch.doneAt = nowLocal(); extra.push({ type: "done" }); }
+  }
+  if (f === "appointment" && v) extra.push({ type: "appointment", note: fmtDT(v) });
+  if ((f === "quoteA" || f === "quoteB") && v) extra.push({ type: "quote", note: money(v) + ((f === "quoteA" ? t.quoteAFrom : t.quoteBFrom) ? " · " + (f === "quoteA" ? t.quoteAFrom : t.quoteBFrom) : "") });
+  if (f === "contractorId" && v && t.status === "open") ch.status = "assigned";
+  if (f === "doneBy" && v && !t.contractorId) ch.contractorId = v;
+  await logPatch(id, extra, ch);
+}
+async function closeTicket(id) {
+  const t = S.tickets[id];
+  await logPatch(id, [{ type: "done" }], { status: "done", doneAt: t.doneAt || nowLocal(), doneBy: t.doneBy || t.contractorId || "" });
+  toast(tl("Als erledigt abgeschlossen", "Marked as done"));
+}
+async function createTicketFromCall() {
+  const c = callCat(); const isOther = CALL.sym === "__other"; const s = isOther ? null : c?.sym.find(x => x.id === CALL.sym); const m = S.machines[CALL.machine];
+  const id = uid();
+  const asked = s ? s.q.filter((_, i) => CALL.checked[i]).map(q => "✓ " + tr(q)).join("\n") : "";
+  const label = s ? tr(s.l) : (isOther && CALL.text ? CALL.text.split(/[.\n]/)[0].slice(0, 60) : tl("Störung", "Fault"));
+  const title = label + " – " + (m ? machineName(m) : tr(c?.name));
+  const contr = contractorsFor(c?.trade, m)[0];
+  const now = nowLocal();
+  await save("tickets", id, { title, propertyId: CALL.prop, machineId: CALL.machine || "", cat: CALL.cat, symptom: CALL.sym || "__other", severity: CALL.ai?.severity || s?.sev || CALL.sev || "amber", status: "open", created: today(), contractorId: contr?.id || "", notes: [CALL.text, asked].filter(Boolean).join("\n\n"), log: [{ at: now, type: "created", note: tl("Anruf vom Mieter", "Call from tenant") }], ...(CALL.ai ? { ai: { summary: CALL.ai.summary || "" } } : {}) });
+  Object.assign(CALL, { prop: "", machine: "", cat: "", sym: "", sev: "amber", text: "", ai: null, checked: {} });
+  location.hash = "t-" + id; toast(tl("Ticket angelegt", "Ticket created"));
+}
+async function suggestInspections(propId) {
+  const existing = vals("inspections").filter(i => i.propertyId === propId);
+  let n = 0;
+  for (const m of vals("machines").filter(m => m.propertyId === propId)) {
+    const c = catOf(m); if (!c) continue;
+    for (const x of c.insp) {
+      if (existing.find(i => i.machineId === m.id && (i.title === x.l.de || i.title === x.l.en || (i.titleL && i.titleL.de === x.l.de)))) continue;
+      const last = m.lastService || "";
+      await save("inspections", uid(), { title: tr(x.l), titleL: x.l, propertyId: propId, machineId: m.id, months: x.m, last, next: last ? addMonths(last, x.m) : today() });
+      n++;
+    }
+  }
+  toast(n ? tl(`${n} Prüfungen hinzugefügt – bitte Termine prüfen`, `${n} inspections added – please check the dates`) : tl("Alle üblichen Prüfungen sind schon eingetragen", "All usual inspections are already listed"));
 }
 
 /* ---------- KI ---------- */
@@ -1146,45 +1569,66 @@ function aiErr(e) {
   else if (e && e.code === "rate_limited") toast(tl("Zu viele Anfragen, bitte kurz warten.", "Too many requests, please wait a moment."));
   else toast(tl("KI-Anfrage fehlgeschlagen.", "AI request failed."));
 }
+const LANGNAME = () => lang === "en" ? "English" : "German";
 async function aiDiagnose() {
-  const p = S.properties[CALL.prop], m = S.machines[CALL.machine], c = CATALOG[CALL.cat], s = c?.sym.find(x => x.id === CALL.sym);
-  CALL.busy = true; render();
-  const L2 = lang === "en" ? "English" : "German";
-  const prompt = `You help a new, non-technical property manager in Germany who is on the phone with a commercial tenant reporting a building fault. Explain simply, no jargon (or explain jargon in brackets). Write all text values in ${L2}.
+  const p = S.properties[CALL.prop], m = S.machines[CALL.machine], c = callCat(), s = c?.sym.find(x => x.id === CALL.sym);
+  CALL.text = $("#call-text")?.value ?? CALL.text;
+  CALL.busy = true; render(true);
+  const prompt = `You help a new, non-technical property manager in Germany who is on the phone with a commercial tenant reporting a building fault. Explain simply, no jargon (or explain jargon in brackets). Write all text values in ${LANGNAME()}.
 Context:
 - Property: ${p ? `${p.name} (${p.type || ""}), tenant ${p.tenant || "?"}` : "unknown"}
 - Equipment: ${c ? c.name.en : "unknown"}${m ? `; make ${m.brand || "?"}, model ${m.model || "?"}, year ${m.year || "?"}, location ${m.location || "?"}` : ""}
-- Fault type chosen: ${s ? s.l.en : "none"}
+- Fault type chosen: ${s ? s.l.en : "other / not in list"}
 - Tenant's words / notes: ${CALL.text || "(none)"}
 Safety first: gas smell, water near electrics, burning smell, people trapped, fire alarm faults are emergencies.
-Reply with only JSON: {"severity":"red|amber|green","summary":"one or two sentences","firstSteps":["..."],"causes":[{"title":"...","explanation":"plain words, what it means and who fixes it","likelihood":1-3}],"questions":["questions still to ask the tenant"],"whoToCall":"which trade/company type to call and how urgently"}. Max 4 causes, 4 steps, 4 questions.`;
+Reply with only JSON: {"severity":"red|amber|green","summary":"one or two sentences","firstSteps":["..."],"causes":[{"title":"...","explanation":"plain words, what it means and who fixes it","likelihood":1}],"questions":["questions still to ask the tenant"],"whoToCall":"which trade/company type to call and how urgently"}. likelihood is 1-3. Max 4 causes, 4 steps, 4 questions.`;
   try {
     const r = await sample.json(prompt, { modelTier: "default" });
-    if (r && typeof r === "object") { if (!SEV[r.severity]) r.severity = s?.sev || "amber"; CALL.ai = r; }
+    if (r && typeof r === "object") { if (!SEV[r.severity]) r.severity = s?.sev || "amber"; CALL.ai = r; if (CALL.sym === "__other") CALL.sev = r.severity; }
   } catch (e) { aiErr(e); }
-  CALL.busy = false; render();
+  CALL.busy = false; render(true);
 }
-async function aiPlate(id, file) {
+function identifyPrompt() {
+  return `This photo shows a piece of building equipment in a German commercial property (the type plate / Typenschild, or the unit itself). Identify it and read what you can. Explain it for a non-technical property manager in ${LANGNAME()}.
+Known category keys: ${Object.entries(CATALOG).map(([k, c]) => `${k} (${c.name.en})`).join(", ")}. Use "other" if none fits.
+Reply with only JSON:
+{"category":"key or other","name":"short label for this unit","brand":"","model":"","serial":"","year":"4 digits or empty","power":"e.g. 24 kW or empty","summary":"2-3 plain sentences: what it is and does","commonFaults":[{"title":"","explanation":""}],"maintenance":"how often it needs service and by whom","warning":"safety note or empty",
+"customType": null unless category is "other", then {"name":"type name","code":"3 capital letters","trade":"heating|electrical|doors|fire|lift|hvac|roof|caretaker|disposal|other","what":"plain explanation","faults":[{"title":"","severity":"red|amber|green","action":"what to do now","questions":["questions to ask the tenant"],"causes":[{"title":"","explanation":"","likelihood":2,"cost":2}]}]}}
+Leave fields empty when unreadable; never guess serial numbers. Max 5 commonFaults; customType max 4 faults, 3 questions and 3 causes each (likelihood and cost 1-3).`;
+}
+async function aiIdentify(id, file) {
   const m = S.machines[id]; if (!m || !file) return;
   S.machines[id] = { ...m, _busy: true }; render();
-  const plateId = await uploadImage(file);
-  const L2 = lang === "en" ? "English" : "German";
-  const prompt = `This photo shows the type plate (Typenschild) or the unit itself of a piece of building equipment in a German commercial property. Read what you can. Then explain the unit for a non-technical property manager in ${L2}.
-Allowed category keys: ${Object.entries(CATALOG).map(([k, c]) => `${k} (${c.name.en})`).join(", ")}.
-Reply with only JSON: {"category":"one key or null","brand":"","model":"","serial":"","year":"4-digit or empty","power":"e.g. 24 kW or empty","summary":"2-3 plain sentences: what this unit is and does","commonFaults":[{"title":"","explanation":""}],"maintenance":"how often it needs service and by whom","warning":"safety note or empty"}. Leave fields empty when unreadable; never guess serial numbers.`;
+  const photoId = await uploadFile(file);
   try {
-    const r = await sample.json(prompt, { images: [file], modelTier: "default" });
+    const r = await sample.json(identifyPrompt(), { images: [file], modelTier: "default" });
     const cur = { ...S.machines[id] }; delete cur._busy;
-    const pick = (k) => (r && r[k] && String(r[k]).trim()) || cur[k] || "";
-    await save("machines", id, { ...cur, brand: pick("brand"), model: pick("model"), serial: pick("serial"), year: pick("year"), power: pick("power"), cat: (r && CATALOG[r.category]) ? (cur.cat || r.category) : cur.cat, ...(plateId ? { plateId } : {}), aiInfo: { summary: r?.summary || "", commonFaults: Array.isArray(r?.commonFaults) ? r.commonFaults.slice(0, 5) : [], maintenance: r?.maintenance || "", warning: r?.warning || "", lang } });
-    toast(tl("Typenschild gelesen – bitte Angaben kurz prüfen.", "Plate read – please check the details."));
-  } catch (e) { const cur = { ...S.machines[id] }; delete cur._busy; if (plateId) cur.plateId = plateId; S.machines[id] = cur; if (plateId) save("machines", id, cur); else render(); aiErr(e); }
+    const pick = k => (r && r[k] && String(r[k]).trim()) || cur[k] || "";
+    let cat = cur.cat; let note = "";
+    if (r && (CATALOG[r.category] || r.category === "other")) { if (r.category !== cur.cat && cur.cat) note = tl("Anlagentyp korrigiert.", "Equipment type corrected."); cat = r.category; }
+    const upd = { ...cur, cat, brand: pick("brand"), model: pick("model"), serial: pick("serial"), year: pick("year"), power: pick("power"),
+      name: cur.scanning ? (r?.name || tl("Unbekannte Anlage", "Unknown equipment")) : (cur.name || r?.name || ""),
+      aiInfo: { summary: r?.summary || "", commonFaults: Array.isArray(r?.commonFaults) ? r.commonFaults.slice(0, 5) : [], maintenance: r?.maintenance || "", warning: r?.warning || "", lang } };
+    delete upd.scanning;
+    if (cat === "other" && r?.customType) upd.customType = r.customType;
+    if (photoId) { if (cur.photoId) upd.plateId = photoId; else upd.photoId = photoId; }
+    await save("machines", id, upd);
+    toast((note ? note + " " : "") + tl("Foto ausgewertet – bitte Angaben kurz prüfen.", "Photo read – please check the details."));
+  } catch (e) { const cur = { ...S.machines[id] }; delete cur._busy; if (photoId && !cur.photoId) cur.photoId = photoId; if (cur.scanning) { cur.name = tl("Unbekannte Anlage", "Unknown equipment"); delete cur.scanning; } await save("machines", id, cur); aiErr(e); }
+}
+async function scanNew(propId, file) {
+  if (!file) return;
+  const id = uid();
+  UI.busy.scan = true;
+  await save("machines", id, { propertyId: propId, cat: "other", name: tl("Wird erkannt …", "Identifying …"), scanning: true });
+  location.hash = "m-" + id;
+  await aiIdentify(id, file);
+  UI.busy.scan = false; render(true);
 }
 async function aiMachineInfo(id) {
   const m = S.machines[id]; if (!m) return; const c = catOf(m);
   S.machines[id] = { ...m, _busy: true }; render();
-  const L2 = lang === "en" ? "English" : "German";
-  const prompt = `Explain this building equipment for a non-technical property manager in Germany, in ${L2}, plain words: type ${c ? c.name.en : "unknown"}, make ${m.brand || "?"}, model ${m.model || "?"}, year ${m.year || "?"}. If you don't know this exact model, say so in the summary and describe the type in general.
+  const prompt = `Explain this building equipment for a non-technical property manager in Germany, in ${LANGNAME()}, plain words: type ${c ? c.name.en : "unknown"}, make ${m.brand || "?"}, model ${m.model || "?"}, year ${m.year || "?"}. If you don't know this exact model, say so in the summary and describe the type in general.
 Reply with only JSON: {"summary":"2-3 sentences","commonFaults":[{"title":"","explanation":""}],"maintenance":"","warning":""}. Max 5 faults.`;
   try {
     const r = await sample.json(prompt, { modelTier: "default" });
@@ -1193,78 +1637,100 @@ Reply with only JSON: {"summary":"2-3 sentences","commonFaults":[{"title":"","ex
   } catch (e) { const cur = { ...S.machines[id] }; delete cur._busy; S.machines[id] = cur; render(); aiErr(e); }
 }
 async function aiNegotiate(id) {
-  readTicketForm(id);
-  const t = S.tickets[id]; const m = S.machines[t.machineId]; const c = CATALOG[t.cat] || catOf(m);
+  const t = S.tickets[id]; const m = S.machines[t.machineId]; const c = ticketCat(t);
   const hist = vals("tickets").filter(x => x.id !== id && x.cat === t.cat && Number(x.cost) > 0).map(x => `${x.title}: ${x.cost} EUR`).slice(0, 6);
-  S.tickets[id] = { ...t, _busy: true }; ticketModal(id);
+  S.tickets[id] = { ...t, _busy: true }; render(true);
   const prompt = `Help a property manager in Germany negotiate a repair quote with a contractor. Be firm but polite and fair; never insulting.
 Repair: ${t.title}. Equipment: ${c ? c.name.en : "?"} ${m ? `${m.brand || ""} ${m.model || ""} (year ${m.year || "?"})` : ""}. Notes: ${t.notes || "-"}.
 Quote 1: ${t.quoteA || "-"} EUR from ${t.quoteAFrom || "?"}. Quote 2: ${t.quoteB || "-"} EUR from ${t.quoteBFrom || "?"}. Internal approval limit: ${S.settings.limit} EUR. Past similar repairs: ${hist.join("; ") || "none"}.
-Reply with only JSON: {"arguments":["4-6 short negotiation points in ${lang === "en" ? "English" : "German"}"],"subject":"German email subject","body":"German email (Sie-Form) to the contractor of the higher or only quote: ask for an itemised breakdown (Material, Arbeitszeit, Anfahrt), mention the comparison quote or past prices if any, ask for a better price, sign as ‚Ihre Objektverwaltung‘","bodyEn":"${lang === "en" ? "English translation of the email" : ""}"}`;
+Reply with only JSON: {"arguments":["4-6 short negotiation points in ${LANGNAME()}"],"subject":"German email subject","body":"German email (Sie-Form) to the contractor of the higher or only quote: ask for an itemised breakdown (Material, Arbeitszeit, Anfahrt), mention the comparison quote or past prices if any, ask for a better price, sign as ${S.settings.signName || "Ihre Objektverwaltung"}","bodyEn":"${lang === "en" ? "English translation of the email" : ""}"}`;
   try {
     const r = await sample.json(prompt, { modelTier: "default" });
     const cur = { ...S.tickets[id] }; delete cur._busy;
     await save("tickets", id, { ...cur, negotiation: { arguments: Array.isArray(r?.arguments) ? r.arguments : [], subject: r?.subject || "", body: r?.body || "", bodyEn: r?.bodyEn || "" } });
-  } catch (e) { const cur = { ...S.tickets[id] }; delete cur._busy; S.tickets[id] = cur; aiErr(e); }
-  if ($("#modal-root").innerHTML) ticketModal(id);
+  } catch (e) { const cur = { ...S.tickets[id] }; delete cur._busy; S.tickets[id] = cur; render(true); aiErr(e); }
 }
-function readTicketForm(id) {
-  const g = s => $(s)?.value ?? "";
-  if (!$("#tform")) return;
-  S.tickets[id] = { ...S.tickets[id], status: g("#t-status"), severity: g("#t-sev"), contractorId: g("#t-contr"), quoteA: Number(g("#t-qa")) || "", quoteAFrom: g("#t-qaf"), quoteB: Number(g("#t-qb")) || "", quoteBFrom: g("#t-qbf"), cost: Number(g("#t-cost")) || "", notes: g("#t-notes") };
+
+/* ---------- Erinnerungs-Alarm ---------- */
+function checkReminders() {
+  if ($("#modal-root").innerHTML) return;
+  const now = nowLocal();
+  const r = vals("reminders").find(x => !x.done && x.at && x.at <= now && !ALERTED.has(x.id) && (new Date(now) - new Date(x.at)) < 12 * 36e5);
+  if (!r) return;
+  ALERTED.add(r.id);
+  openModal(`<div class="mhead"><div><div class="eyebrow">⏰ ${tl("Erinnerung", "Reminder")} · ${fmtDT(r.at)}</div><h2>${esc(r.subject)}</h2></div></div>
+    <p style="margin:0 0 6px"><a href="#p-${r.propertyId}" data-close>${esc(propName(r.propertyId))}</a></p>${r.note ? `<p class="prose" style="white-space:pre-wrap">${esc(r.note)}</p>` : ""}
+    <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-act="rem-snooze" data-id="${r.id}" data-min="60">${tl("In 1 Std.", "In 1 hour")}</button><button class="btn" data-act="rem-snooze" data-id="${r.id}" data-min="tomorrow">${tl("Morgen 9:00", "Tomorrow 9:00")}</button><button class="btn primary" data-act="rem-done" data-id="${r.id}">${tl("Erledigt", "Done")}</button></div>`);
 }
+setInterval(() => { checkReminders(); renderNav(); }, 30000);
 
 /* ---------- Nach dem Rendern ---------- */
 function afterRender(r) {
   if (r.startsWith("m-") && window.QRCode) {
     const el = $("#qr");
-    if (el) { el.innerHTML = ""; try { new QRCode(el, { text: (APP_URL || "objekt-leitstand") + "#" + r, width: 300, height: 300, correctLevel: QRCode.CorrectLevel.M }); } catch (e) {} }
+    if (el) { el.innerHTML = ""; try { new QRCode(el, { text: APP_URL + "#" + r, width: 300, height: 300, correctLevel: QRCode.CorrectLevel.M }); } catch (e) {} }
   }
-  const lim = $("#limit-input"); if (lim) lim.onchange = () => saveSettings({ limit: Number(lim.value) || 0 });
   const ct = $("#call-text"); if (ct) ct.oninput = () => CALL.text = ct.value;
-  const gq = $("#gloss-q"); if (gq) gq.oninput = () => { glossQ = gq.value; const q = glossQ.trim().toLowerCase(); $("#gloss-list").innerHTML = glossRows(GLOSSARY.filter(g => !q || g.join(" ").toLowerCase().includes(q))); };
+  const gq = $("#gloss-q"); if (gq) gq.oninput = () => { UI.glossQ = gq.value; $("#gloss-list").innerHTML = glossRows(); };
+  const bp = $("#board-prop"); if (bp) bp.onchange = () => { UI.boardProp = bp.value; render(true); };
+  [["set-limit", v => ({ limit: Number(v) || 0 })], ["set-sign", v => ({ signName: v })], ["set-fin", v => ({ financeEmail: v })]].forEach(([k, fn]) => { const el = $("#" + k); if (el) el.onchange = () => saveSettings(fn(el.value.trim())); });
+  if (lastRoute === "dashboard" || !lastRoute) setTimeout(checkReminders, 400);
 }
 
 /* ---------- Ereignisse ---------- */
 document.addEventListener("click", async e => {
-  const el = e.target.closest("[data-act],[data-call-prop],[data-call-machine],[data-call-cat],[data-call-sym],[data-ticket],[data-insp],[data-cat],[data-tfilter],[data-copy],[data-copy-el],[data-close],[data-overlay]");
+  const el = e.target.closest("[data-act],[data-call-prop],[data-call-machine],[data-call-cat],[data-call-sym],[data-call-sev],[data-insp],[data-cat],[data-tfilter],[data-copy],[data-copy-el],[data-close],[data-overlay],[data-log],[data-mail]");
   if (!el) return;
   if (el.hasAttribute("data-overlay") && e.target !== el) return;
   if (el.hasAttribute("data-overlay") || el.hasAttribute("data-close")) { closeModal(); return; }
   const d = el.dataset;
-  if (d.callProp != null) { if (CALL.prop !== d.callProp) Object.assign(CALL, { prop: d.callProp, machine: "", cat: "", sym: "", ai: null, checked: {} }); render(); return; }
-  if (d.callMachine != null) { const m = S.machines[d.callMachine]; Object.assign(CALL, { machine: d.callMachine, cat: m?.cat || "", sym: "", ai: null, checked: {} }); render(); return; }
-  if (d.callCat != null) { Object.assign(CALL, { machine: "", cat: d.callCat, sym: "", ai: null, checked: {} }); render(); return; }
-  if (d.callSym != null) { CALL.sym = d.callSym; CALL.checked = {}; render(); return; }
-  if (d.ticket != null) { ticketModal(d.ticket); return; }
+  if (d.callProp != null) { if (CALL.prop !== d.callProp) Object.assign(CALL, { prop: d.callProp, machine: "", cat: "", sym: "", ai: null, checked: {} }); render(true); return; }
+  if (d.callMachine != null) { const m = S.machines[d.callMachine]; Object.assign(CALL, { machine: d.callMachine, cat: m?.cat || "", sym: "", ai: null, checked: {} }); render(true); return; }
+  if (d.callCat != null) { Object.assign(CALL, { machine: "", cat: d.callCat, sym: "", ai: null, checked: {} }); render(true); return; }
+  if (d.callSym != null) { CALL.sym = d.callSym; CALL.checked = {}; render(true); return; }
+  if (d.callSev != null) { CALL.sev = d.callSev; render(true); return; }
   if (d.insp != null) { inspForm(d.insp); return; }
-  if (d.cat != null) { catOpen = catOpen === d.cat ? "" : d.cat; render(); const x = $("#cat-detail"); if (x) x.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
-  if (d.tfilter != null) { ticketFilter = d.tfilter; render(); return; }
+  if (d.cat != null) { UI.catOpen = UI.catOpen === d.cat ? "" : d.cat; render(true); const x = $("#cat-detail"); if (x) x.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+  if (d.tfilter != null) { UI.ticketFilter = d.tfilter; render(true); return; }
+  if (d.mail != null) { UI.mailKind = d.mail; render(true); return; }
+  if (d.log != null) { const note = ($("#log-note")?.value || "").trim(); if (d.log === "note" && !note) { toast(tl("Erst eine Notiz eintippen", "Type a note first")); return; } await logPatch(d.id, [{ type: d.log, note }]); toast(tl("Im Verlauf gespeichert", "Saved to timeline")); return; }
   if (d.copy != null || d.copyEl != null) {
     const text = d.copy != null ? d.copy : ($("#" + d.copyEl)?.innerText || "");
     try { await navigator.clipboard.writeText(text); toast(tl("Kopiert", "Copied")); }
-    catch (_) { const r = document.createRange(); const n = d.copyEl ? $("#" + d.copyEl) : el.previousElementSibling; if (n) { r.selectNodeContents(n); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } toast(tl("Markiert – mit Strg+C kopieren", "Selected – press Ctrl+C to copy")); }
+    catch (_) { const n = d.copyEl ? $("#" + d.copyEl) : el.previousElementSibling; if (n) { const r = document.createRange(); r.selectNodeContents(n); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } toast(tl("Markiert – mit Strg+C kopieren", "Selected – press Ctrl+C to copy")); }
     return;
   }
   const id = d.id;
   switch (d.act) {
     case "new-prop": propForm(); break;
     case "edit-prop": propForm(id); break;
+    case "edit-building": buildingForm(id); break;
+    case "new-contact": contactForm(d.prop); break;
+    case "edit-contact": contactForm(d.prop, d.cid); break;
+    case "del-contact": closeModal(); await patch("properties", d.prop, { contacts: (S.properties[d.prop].contacts || []).filter(x => x.id !== d.cid) }); break;
     case "new-machine": machineForm(null, d.prop); break;
     case "edit-machine": machineForm(id); break;
     case "new-contr": contrForm(null, d.trade); break;
     case "edit-contr": contrForm(id); break;
     case "new-insp": inspForm(); break;
-    case "del-prop": confirmDel(tl("Objekt mit allen Daten löschen?", "Delete this property and its data?"), async () => { for (const m of vals("machines").filter(m => m.propertyId === id)) await remove("machines", m.id); await remove("properties", id); location.hash = "objects"; }); break;
+    case "new-rem": remForm(null, d.prop); break;
+    case "edit-rem": remForm(id); break;
+    case "rem-done": closeModal(); await patch("reminders", id, { done: true }); break;
+    case "rem-snooze": { closeModal(); let nat; if (d.min === "tomorrow") { const x = new Date(); x.setDate(x.getDate() + 1); nat = localISO(x).slice(0, 10) + "T09:00"; } else { nat = localISO(new Date(Date.now() + Number(d.min) * 6e4)); } ALERTED.delete(id); await patch("reminders", id, { at: nat }); toast(tl("Verschoben auf ", "Moved to ") + fmtDT(nat)); break; }
+    case "del-rem": confirmDel(tl("Erinnerung löschen?", "Delete this reminder?"), () => remove("reminders", id)); break;
+    case "del-prop": confirmDel(tl("Objekt mit allen Anlagen löschen?", "Delete this property and its equipment?"), async () => { for (const m of vals("machines").filter(m => m.propertyId === id)) await remove("machines", m.id); await remove("properties", id); location.hash = "objects"; }); break;
     case "del-machine": { const pid = S.machines[id]?.propertyId; confirmDel(tl("Anlage löschen?", "Delete this equipment?"), async () => { await remove("machines", id); location.hash = "p-" + pid; }); break; }
     case "del-contr": confirmDel(tl("Dienstleister löschen?", "Delete this contractor?"), () => remove("contractors", id)); break;
     case "del-insp": confirmDel(tl("Prüfung löschen?", "Delete this inspection?"), () => remove("inspections", id)); break;
-    case "del-ticket": confirmDel(tl("Ticket löschen?", "Delete this ticket?"), () => remove("tickets", id)); break;
-    case "save-ticket": readTicketForm(id); { const t = { ...S.tickets[id] }; delete t._busy; await save("tickets", id, t); closeModal(); toast(tl("Gespeichert", "Saved")); } break;
+    case "del-ticket": confirmDel(tl("Ticket löschen?", "Delete this ticket?"), async () => { await remove("tickets", id); location.hash = "tickets"; }); break;
+    case "close-ticket": closeTicket(id); break;
+    case "reopen-ticket": await logPatch(id, [{ type: "status", note: tr(STATUS.open) }], { status: "open" }); break;
+    case "mail-sent": { const mail = mailDraft(UI.mailKind, S.tickets[id]); await logPatch(id, [{ type: UI.mailKind === "tenant" ? "tenant" : "email", note: mail.subject }]); toast(tl("Im Verlauf gespeichert", "Saved to timeline")); break; }
+    case "log-answer": { const v = ($("#brief-answer")?.value || "").trim(); if (!v) { toast(tl("Erst die Antwort eintippen", "Type the answer first")); return; } await logPatch(id, [{ type: "call", note: v }]); toast(tl("Im Verlauf gespeichert", "Saved to timeline")); break; }
     case "negotiate": aiNegotiate(id); break;
-    case "insp-done": { const i = S.inspections[id]; await patch("inspections", id, { last: today(), next: addMonths(today(), i.months) }); toast(tl("Als erledigt markiert – nächster Termin berechnet", "Marked done – next date calculated")); break; }
+    case "insp-done": { const i = S.inspections[id]; await patch("inspections", id, { last: today(), next: addMonths(today(), i.months) }); toast(tl("Erledigt – nächster Termin berechnet", "Done – next date calculated")); break; }
     case "suggest-insp": suggestInspections(d.prop); break;
-    case "call-reset": Object.assign(CALL, { prop: "", machine: "", cat: "", sym: "", text: "", ai: null, checked: {} }); render(); break;
+    case "call-reset": Object.assign(CALL, { prop: "", machine: "", cat: "", sym: "", sev: "amber", text: "", ai: null, checked: {} }); render(true); break;
     case "call-ai": aiDiagnose(); break;
     case "call-ticket": createTicketFromCall(); break;
     case "call-from-machine": { const m = S.machines[id]; Object.assign(CALL, { prop: m.propertyId, machine: id, cat: m.cat, sym: "", text: "", ai: null, checked: {} }); break; }
@@ -1274,45 +1740,25 @@ document.addEventListener("click", async e => {
 });
 document.addEventListener("change", async e => {
   const el = e.target;
+  if (el.matches("[data-tf]")) { const id = route().slice(2); onTicketField(id, el.dataset.tf, el); return; }
   if (el.matches("[data-q]")) { CALL.checked[el.dataset.q] = el.checked; return; }
-  if (el.matches("[data-plate]")) { aiPlate(el.dataset.plate, el.files[0]); return; }
-  if (el.matches("[data-photo-m]")) { const id = el.dataset.photoM; const pid = await uploadImage(el.files[0]); if (pid) patch("machines", id, { photoId: pid }); return; }
-  if (el.matches("[data-doc]")) { const id = el.dataset.doc; const f = el.files[0]; if (!f || !assets) return; try { const r = await assets.upload(f); const m = S.machines[id]; await patch("machines", id, { docs: [...(m.docs || []), { id: r.id, name: f.name }] }); toast(tl("Dokument gespeichert", "Document saved")); } catch (err) { toast(tl("Upload fehlgeschlagen", "Upload failed")); } }
+  if (el.matches("[data-plate]")) { aiIdentify(el.dataset.plate, el.files[0]); return; }
+  if (el.matches("[data-scan]")) { scanNew(el.dataset.scan, el.files[0]); return; }
+  if (el.matches("[data-photo-m]")) { const pid = await uploadFile(el.files[0]); if (pid) patch("machines", el.dataset.photoM, { photoId: pid }); return; }
+  if (el.matches("[data-invoice]")) { const id = el.dataset.invoice; const fid = await uploadFile(el.files[0]); if (fid) { await logPatch(id, [{ type: "invoice", note: el.files[0].name }], { invoiceId: fid }); toast(tl("Rechnung gespeichert", "Invoice saved")); } return; }
+  if (el.matches("[data-doc]")) { const id = el.dataset.doc; const f = el.files[0]; if (!f || !assets) return; const fid = await uploadFile(f); if (fid) { const m = S.machines[id]; await patch("machines", id, { docs: [...(m.docs || []), { id: fid, name: f.name }] }); toast(tl("Dokument gespeichert", "Document saved")); } }
 });
-document.addEventListener("keydown", e => { if (e.key === "Escape" && $("#modal-root").innerHTML) closeModal(); });
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && $("#modal-root").innerHTML) closeModal();
+  if (e.key === "Enter" && e.target.matches("[data-insp]")) inspForm(e.target.dataset.insp);
+});
 $("#lang-de").onclick = () => setLang("de");
 $("#lang-en").onclick = () => setLang("en");
-function setLang(l) { lang = l; try { localStorage.setItem("ol-lang", l); } catch (e) {} render(); }
+function setLang(l) { lang = l; try { localStorage.setItem("ol-lang", l); } catch (e) {} render(true); }
 
 function confirmDel(msg, fn) {
   openModal(`<div class="mhead"><h2>${esc(msg)}</h2></div><p class="muted">${tl("Das kann nicht rückgängig gemacht werden.", "This can't be undone.")}</p><div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" data-close>${tl("Abbrechen", "Cancel")}</button><button class="btn primary" id="cd-ok">${tl("Ja, löschen", "Yes, delete")}</button></div>`);
   $("#cd-ok").onclick = async () => { closeModal(); await fn(); };
-}
-async function createTicketFromCall() {
-  const c = CATALOG[CALL.cat]; const s = c?.sym.find(x => x.id === CALL.sym); const m = S.machines[CALL.machine];
-  const id = uid();
-  const asked = s ? s.q.filter((_, i) => CALL.checked[i]).map(q => "✓ " + tr(q)).join("\n") : "";
-  const title = (s ? tr(s.l) : tl("Störung", "Fault")) + " – " + (m ? machineName(m) : tr(c?.name));
-  const contr = contractorsFor(c?.trade, m)[0];
-  await save("tickets", id, { title, propertyId: CALL.prop, machineId: CALL.machine || "", cat: CALL.cat, symptom: CALL.sym || "", severity: CALL.ai?.severity || s?.sev || "amber", status: "open", created: today(), contractorId: contr?.id || "", notes: [CALL.text, asked].filter(Boolean).join("\n\n"), ...(CALL.ai ? { ai: { summary: CALL.ai.summary || "" } } : {}) });
-  Object.assign(CALL, { prop: "", machine: "", cat: "", sym: "", text: "", ai: null, checked: {} });
-  location.hash = "tickets"; toast(tl("Ticket angelegt", "Ticket created"));
-  setTimeout(() => ticketModal(id), 50);
-}
-async function suggestInspections(propId) {
-  const existing = vals("inspections").filter(i => i.propertyId === propId);
-  let n = 0;
-  for (const m of vals("machines").filter(m => m.propertyId === propId)) {
-    const c = catOf(m); if (!c) continue;
-    for (const x of c.insp) {
-      const title = tr(x.l);
-      if (existing.find(i => i.machineId === m.id && (i.title === x.l.de || i.title === x.l.en || (i.titleL && i.titleL.de === x.l.de)))) continue;
-      const last = m.lastService || "";
-      await save("inspections", uid(), { title, titleL: x.l, propertyId: propId, machineId: m.id, months: x.m, last, next: last ? addMonths(last, x.m) : today() });
-      n++;
-    }
-  }
-  toast(n ? tl(`${n} Prüfungen hinzugefügt – bitte Termine prüfen`, `${n} inspections added – please check the dates`) : tl("Alle üblichen Prüfungen sind schon eingetragen", "All usual inspections are already listed"));
 }
 async function saveQR(id) {
   const el = $("#qr canvas"); if (!el || !downloads) return;
